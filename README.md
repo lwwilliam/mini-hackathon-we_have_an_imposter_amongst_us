@@ -1,8 +1,12 @@
 # Experian-Hackathon
 
+
+# Environment Setup
 ```bash
-1. . venv.sh
+. venv.sh
+```
 
-2. flask run / uwsgi --ini uwsgi.ini
-
+# Run Flask App
+```bash
+flask run / uwsgi --ini uwsgi.ini
 ```
