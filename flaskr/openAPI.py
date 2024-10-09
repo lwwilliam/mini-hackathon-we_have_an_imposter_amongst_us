@@ -1,24 +1,29 @@
-from flask import jsonify, request
+from flask import jsonify
 from . import api_bp
-from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
-from bson import ObjectId
-from openai import OpenAI
+# from pymongo import MongoClient
+# from bson import ObjectId
+# from openai import OpenAI
+from groq import Groq
+
 
 load_dotenv()
-client = OpenAI()
+# client = OpenAI()
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 @api_bp.route('/ai', methods=['GET'])
 def openAPI():
     try:
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
+        chat_completion = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "Hello!"}
-            ]
+                {
+                    "role": "user",
+                    "content": "Explain the importance of fast language models",
+                }
+            ],
+            model="llama3-8b-8192",
         )
-        return jsonify(completion.choices[0].message)
+        return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
