@@ -1,6 +1,3 @@
-# Experian-Hackathon
-
-
 # Environment Setup
 ```bash
 . venv.sh
