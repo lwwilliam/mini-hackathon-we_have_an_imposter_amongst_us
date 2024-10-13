@@ -1,17 +1,18 @@
-.venv/
+# Ignore global files
+*.env
+.DS_Store
+.vscode/
 
-*.pyc
-__pycache__/
-flaskr/__pycache__/
-
-instance/
-
-.pytest_cache/
-.coverage
-htmlcov/
-
-dist/
-build/
-*.egg-info/
-
-.env
+# Ignore Backend files
+backend/.venv/
+backend/*.pyc
+backend/__pycache__/
+backend/flaskr/__pycache__/
+backend/instance/
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/dist/
+backend/build/
+backend/*.egg-info/
+backend/.env
