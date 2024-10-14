@@ -7,6 +7,6 @@ const Test2 = () => {
       <p>Test 2 page content</p>
     </div>
   );
-}
+};
 
 export default Test2;
