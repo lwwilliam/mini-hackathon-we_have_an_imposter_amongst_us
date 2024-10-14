@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UploadPDFModal from './components/uploadPdf';
 
 const SearchBar = () => {
   return (
@@ -16,10 +17,20 @@ const SearchBar = () => {
 }
 
 const UploadButton = () => {
+  const [modelState, setModalState] = useState(false)
+
+  const openUploadPDFModal = () => {
+    setModalState(true)
+  }
+
   return (
+    <>
     <button
       className='bg-[#57116F] text-white px-5 rounded-3xl'
+      onClick={openUploadPDFModal}
     >Upload</button>
+    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} />
+    </>
   )
 }
 
@@ -56,8 +67,8 @@ const Resume = () => {
 			</div>
       <div id="body" className='flex flex-col mx-32 py-12 flex-1 gap-12 overflow-hidden'>
         <div className='flex space-x-0 gap-96'>
-          <h1 class="bg-gradient-to-r from-[#57116F] to-[#A720D4] inline-block text-transparent bg-clip-text font-[700] text-6xl">Resumes</h1>
-          <div class='flex flex-1 gap-5 my-2'>
+          <h1 className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl">Resumes</h1>
+          <div className='flex flex-1 gap-5 my-2'>
             <SearchBar />
             <UploadButton />
           </div>
