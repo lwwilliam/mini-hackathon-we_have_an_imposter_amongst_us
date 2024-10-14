@@ -3,6 +3,7 @@ from . import api_bp
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from bson import ObjectId
 
 load_dotenv()
 DB_USER = os.environ.get("DB_USER")
@@ -11,6 +12,7 @@ DB_PASSWORD = os.environ.get("DB_PASSWORD")
 mongo_client = MongoClient(f'mongodb+srv://{DB_USER}:{DB_PASSWORD}@data.rnsqw.mongodb.net/')
 db = mongo_client['experian']
 tags_collection = db['tags']
+pdf_collection = db['pdf']
 
 @api_bp.route('/createTags', methods=['POST'])
 def createTags():
@@ -35,3 +37,26 @@ def getAllTags():
 		tag['_id'] = str(tag['_id'])
 		tags.append(tag)
 	return jsonify(tags), 200
+
+@api_bp.route('/getPdfWithTags', methods=['GET'])
+def getPdfWithTags():
+	tags_id = request.json.get('tags')
+
+	if not tags_id:
+		return jsonify({"error": "No tags provided"}), 400
+	for tag_id in tags_id:
+		if not ObjectId.is_valid(tag_id):
+			return jsonify({"error": "Invalid tag id"}), 400
+	
+	print(tags_id)
+	res = pdf_collection.find({"tags_id": {"$all": [ObjectId(tag_id) for tag_id in tags_id]}})
+	res = list(res)
+
+	pdfs = []
+	for pdf in res:
+		pdf['_id'] = str(pdf['_id'])
+		pdfs.append(pdf)
+
+	if not pdfs:
+		return jsonify({"error": "No pdfs found with the tags"}), 404
+	return jsonify(pdfs), 200
