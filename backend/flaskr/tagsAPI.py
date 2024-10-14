@@ -16,47 +16,48 @@ pdf_collection = db['pdf']
 
 @api_bp.route('/createTags', methods=['POST'])
 def createTags():
-	tags = request.json.get('tags')
+    tags = request.json.get('tags')
 
-	if not tags:
-		return jsonify({"error": "No tags provided"}), 400
-	
-	tags_find = tags_collection.find_one({"tags_name": tags})
+    if not tags:
+        return jsonify({"error": "No tags provided"}), 400
+    
+    tags_find = tags_collection.find_one({"tags_name": tags})
 
-	if tags_find:
-		return jsonify({"error": "Tags already exist"}), 400
-	
-	tags_collection.insert_one({"tags_name": tags})
-	return jsonify({"message": "Tags created successfully"}), 201
+    if tags_find:
+        return jsonify({"error": "Tags already exist"}), 400
+    
+    tags_collection.insert_one({"tags_name": tags})
+    return jsonify({"message": "Tags created successfully"}), 201
 
 @api_bp.route('/getAllTags', methods=['GET'])
 def getAllTags():
-	tags = []
+    tags = []
 
-	for tag in tags_collection.find({}):
-		tag['_id'] = str(tag['_id'])
-		tags.append(tag)
-	return jsonify(tags), 200
+    for tag in tags_collection.find({}):
+        tag['_id'] = str(tag['_id'])
+        tags.append(tag)
+    return jsonify(tags), 200
 
 @api_bp.route('/getPdfWithTags', methods=['GET'])
 def getPdfWithTags():
-	tags_id = request.json.get('tags')
+    tags_id = request.json.get('tags')
 
-	if not tags_id:
-		return jsonify({"error": "No tags provided"}), 400
-	for tag_id in tags_id:
-		if not ObjectId.is_valid(tag_id):
-			return jsonify({"error": "Invalid tag id"}), 400
-	
-	print(tags_id)
-	res = pdf_collection.find({"tags_id": {"$all": [ObjectId(tag_id) for tag_id in tags_id]}})
-	res = list(res)
+    if not tags_id:
+        return jsonify({"error": "No tags provided"}), 400
+    for tag_id in tags_id:
+        if not ObjectId.is_valid(tag_id):
+            return jsonify({"error": "Invalid tag id"}), 400
+        else:
+            ObjectId(tag_id)
+    
+    res = pdf_collection.find({"tags_id": {"$all": tags_id}})
+    res = list(res)
 
-	pdfs = []
-	for pdf in res:
-		pdf['_id'] = str(pdf['_id'])
-		pdfs.append(pdf)
+    pdfs = []
+    for pdf in res:
+        pdf['_id'] = str(pdf['_id'])
+        pdfs.append(pdf)
 
-	if not pdfs:
-		return jsonify({"error": "No pdfs found with the tags"}), 404
-	return jsonify(pdfs), 200
+    if not pdfs:
+        return jsonify({"error": "No pdfs found with the tags"}), 404
+    return jsonify(pdfs), 200
