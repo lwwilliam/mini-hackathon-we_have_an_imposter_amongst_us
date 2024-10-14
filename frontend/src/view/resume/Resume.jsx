@@ -76,11 +76,11 @@ const ResumeTables = () => {
   )
 }
 
-// {/* <div className='flex flex-col overflow-auto text-center flex-1 bg-white border-collapse'> */}
+// <div className='flex flex-col overflow-auto text-center flex-1 bg-white border-collapse'>
 //   { /** max 14 entries i think? */ }
 //   { Array(7).fill(<TableRowData />) }
 //   { Array(7).fill(<TableEmptyRow />) }
-// {/* </div> */}
+// </div>
 
 const Resume = () => {
   const nav = useNavigate()
