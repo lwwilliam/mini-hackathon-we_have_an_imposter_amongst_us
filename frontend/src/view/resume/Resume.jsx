@@ -50,10 +50,13 @@ const Resume = () => {
   const nav = useNavigate()
 
   return (
-    <div className='flex bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
-      <div className='flex flex-col px-24 py-28 flex-1 gap-12'>
+    <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
+      <div id="header" className='bg-black/60 w-screen h-16 flex'>
+
+			</div>
+      <div id="body" className='flex flex-col mx-32 py-12 flex-1 gap-12 overflow-hidden'>
         <div className='flex space-x-0 gap-96'>
-          <h1 class="bg-gradient-to-r from-[#57116F] to-[#A720D4] inline-block text-transparent bg-clip-text font-bold text-6xl">Resumes</h1>
+          <h1 class="bg-gradient-to-r from-[#57116F] to-[#A720D4] inline-block text-transparent bg-clip-text font-[700] text-6xl">Resumes</h1>
           <div class='flex flex-1 gap-5 my-2'>
             <SearchBar />
             <UploadButton />
