@@ -7,6 +7,7 @@ import {
   QualPriority,
 } from '../../types';
 import { JobDescriptionModal } from './jobDescriptionModal';
+import UploadModal from '../../components/jdPdfUpload/jdPdfUpload'
 
 const emptyJob: Job = {
   _id: '',
@@ -158,6 +159,7 @@ const JobDescriptions = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const editButtonRef = useRef<HTMLDivElement | null>(null);
+  const [jdmodelState, setJdModalState] = useState(false)
 
   useEffect(() => {
     getJobDescs(setJobDescriptions);
@@ -182,11 +184,16 @@ const JobDescriptions = () => {
 
   }, [isEditing])
 
+  const openUploadPDFModal = () => {
+    setJdModalState(true)
+  }
+
   return (
     <div
       id="main"
       className="bg-gradient-to-b from-[#E8E8E8] to-[#F4D2FF] w-screen h-screen flex flex-col"
     >
+      <UploadModal open={jdmodelState} onClose={() => setJdModalState(false)} />
       <div id="header" className="bg-black/60 w-screen h-16 flex"></div>
       <div id="body" className="flex flex-col mx-32">
         <div id="body-header" className="flex flex-row justify-between py-12">
@@ -229,6 +236,7 @@ const JobDescriptions = () => {
               className="flex flex-col ml-5 w-20 h-10 bg-[#57116F] rounded-full
             justify-center text-center text-white transition duration-150 ease-in-out
             hover:-translate-y-2 cursor-pointer"
+            onClick={openUploadPDFModal}
             >
               New
             </div>
