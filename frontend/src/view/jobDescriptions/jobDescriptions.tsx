@@ -390,11 +390,37 @@ const JobDescriptionCard: React.FC<JobDescriptionCardProps> = ({
 const JobDescriptions = () => {
   const [currentJobDesc, setCurrentJobDesc] = useState<Job>(emptyJob);
   const [modalState, setModalState] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const editButtonRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+
+    if (isEditing) {
+      editButtonRef.current!.style.backgroundColor = '#FF3737';
+      editButtonRef.current!.style.width = '7rem';
+    } else {
+      editButtonRef.current!.style.backgroundColor = '#57116F';
+      editButtonRef.current!.style.width = '5rem';
+    }
+
+  }, [isEditing])
 
   const openJobDescriptionModal: (job: Job) => void = (job) => {
     setCurrentJobDesc(job);
     setModalState(true);
   };
+
+  const handleJobDescriptionCardClick: (job: Job) => void = (job) => {
+    
+    if (isEditing) {
+      console.log('Editing job description');
+      openJobDescriptionModal(job)
+    } else {
+      console.log('Open analysis page')
+    }
+  }
+
 
   return (
     <div
@@ -424,15 +450,25 @@ const JobDescriptions = () => {
               id="filter"
               className="flex flex-col ml-5 w-20 h-10 bg-[#57116F] rounded-full
             justify-center text-center text-white transition duration-150 ease-in-out
-            hover:-translate-y-2"
+            hover:-translate-y-2 cursor-pointer"
             >
               Filter
+            </div>
+            <div
+              id="edit"
+              ref={editButtonRef}
+              className="flex flex-col ml-5 w-20 h-10 bg-[#57116F] rounded-full
+            justify-center text-center text-white transition duration-150 ease-in-out
+            hover:-translate-y-2 cursor-pointer"
+            onClick={() => setIsEditing(!isEditing)}
+            >
+              {isEditing ? 'Stop Editing' : 'Edit'}
             </div>
             <div
               id="new"
               className="flex flex-col ml-5 w-20 h-10 bg-[#57116F] rounded-full
             justify-center text-center text-white transition duration-150 ease-in-out
-            hover:-translate-y-2"
+            hover:-translate-y-2 cursor-pointer"
             >
               New
             </div>
@@ -441,7 +477,7 @@ const JobDescriptions = () => {
         <div id="body-body" className="grid grid-rows-3 grid-cols-4 gap-5">
           <JobDescriptionCard
             job={testJob}
-            onClick={() => openJobDescriptionModal(testJob)}
+            onClick={() => handleJobDescriptionCardClick(testJob)}
           />
         </div>
       </div>
