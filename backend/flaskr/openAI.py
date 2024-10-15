@@ -1,4 +1,5 @@
 from flask import jsonify, request
+import requests
 import json
 from . import api_bp
 import os
@@ -25,11 +26,12 @@ jd_collection = db['jobDescription']
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-def storePDF(file):
+def storePDF(file, tags):
     original_filename = file.filename
     pdf_entry = {
-        "original_filename": original_filename
-    }
+        "original_filename": original_filename,
+        **tags
+   }
 
     inserted_id = pdf_collection.insert_one(pdf_entry).inserted_id
 
@@ -41,6 +43,19 @@ def storePDF(file):
         {"_id": inserted_id},
         {"$set": {"stored_filename": new_filename}}
     )
+
+def fetch_tags():
+    try:
+        response = requests.get('http://localhost:5000/api/getAllTags')  # URL of your Flask route
+        if response.status_code == 200:
+            tags = response.json()  # Assuming it returns JSON
+            return tags
+        else:
+            print(f"Error: {response.status_code}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}") 
+
+tags_json = '{tag_ids: ["tagid1", "tagid2", "tagid3"]}'
 
 @api_bp.route('/ai', methods=['POST'])
 def openAI():
@@ -54,8 +69,9 @@ def openAI():
         return jsonify({"error": "No selected file"}), 400
 
     if file:
-        print(Fore.RED, getAllTags()[0].get_json(), Style.RESET_ALL)
-        storePDF(file)
+        # print(Fore.RED, getAllTags()[0].get_json(), Style.RESET_ALL)
+        # print(tags_json)
+        # print(fetch_tags())
         reader = PdfReader(file)
         page = reader.pages[0]
         extract_text = page.extract_text()
@@ -63,14 +79,25 @@ def openAI():
             chat_completion = client.chat.completions.create(
                 messages=[
                     {
+                        "role": "system",
+                        "content": "You are a hr that takes in a resume as text, your job is to match which tags best suits the resume. The tags will be passed to you in json form\n"
+                        f"The JSON object you return will be in this format:\n{tags_json}\n"
+                        "the return JSON object must have between 1 to 3 _id in an array form\n"
+                        f"Here are the tag name, _id and description:\n{fetch_tags()}\n",
+                        # "response_format": {"type": "json_object"}
+                    },
+                    {
                         "role": "user",
-                        "content": extract_text + " extract the main point",
+                        "content": "match the tags that fit this resume:\n" + extract_text,
+                        # "response_format": {"type": "json_object"}
                     }
                 ],
                 model="llama3-8b-8192",
+                response_format={"type": "json_object"},
             )
+            storePDF(file, json.loads(chat_completion.choices[0].message.content))
             # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
-            return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
+            return jsonify({"msg" : json.loads(chat_completion.choices[0].message.content)}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
