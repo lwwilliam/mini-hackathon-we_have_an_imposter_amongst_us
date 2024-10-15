@@ -165,17 +165,12 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
     updateJobState(job);
   }, [job]);
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = async (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      updateJobDesc(jobState)
+      await updateJobDesc(jobState)
+      onClose();
     }
   };
-
-  useEffect(() => {
-
-    onClose();
-
-  }, [jobState]);
 
 
   const handleAddResponsibilityListItem = () => {
