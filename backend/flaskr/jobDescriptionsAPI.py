@@ -88,12 +88,12 @@ def getJobDescription():
 def updateJobDescription():
     data = request.json
 
-    required_fields = ['id', 'title', 'mode', 'type', 'position', 'location', 'description', 'qualifications', 'responsibilities']
+    required_fields = ['_id', 'title', 'mode', 'type', 'position', 'location', 'description', 'qualifications', 'responsibilities']
     for field in required_fields:
         if not data.get(field):
             return jsonify({'error': f'{field} is required'}), 400
 
-    jd_id = data.get('id')
+    jd_id = data.get('_id')
 
     if not ObjectId.is_valid(jd_id):
         return jsonify({'error': 'Invalid job description id'}), 400

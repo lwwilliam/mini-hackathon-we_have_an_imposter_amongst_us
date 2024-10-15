@@ -22,6 +22,7 @@ type Qualification = {
 };
 
 type Job = {
+  _id: string;
   title: string;
   mode: JobMode;
   type: JobType;

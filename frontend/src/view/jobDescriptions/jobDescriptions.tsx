@@ -5,10 +5,12 @@ import {
   JobType,
   Qualification,
   QualPriority,
-} from '../../types.ts';
-import Modal from '../../components/Modal.tsx';
+} from '../../types';
+import Modal from '../../components/Modal';
+import { useLocation } from 'react-router-dom';
 
 const emptyJob: Job = {
+  _id: '',
   title: '',
   mode: JobMode.Remote,
   type: JobType.FullTime,
@@ -24,6 +26,7 @@ const emptyJob: Job = {
 };
 
 const testJob: Job = {
+  _id: '1',
   title: 'Product Engineer [PHP]',
   mode: JobMode.Remote,
   type: JobType.FullTime,
@@ -113,7 +116,13 @@ const QualificationBean: React.FC<QualificationBeanProps> = ({
   );
 };
 
-const ResponsibilityListItem = ({ content, onChange, onDelete }) => {
+interface ResponsibilityListItemProps {
+  content: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onDelete: () => void;
+}
+
+const ResponsibilityListItem: React.FC<ResponsibilityListItemProps> = ({ content, onChange, onDelete }) => {
   return (
     <li>
       <div className="flex flex-row justify-between w-full">
@@ -128,19 +137,46 @@ const ResponsibilityListItem = ({ content, onChange, onDelete }) => {
   );
 };
 
+const updateJobDesc = async (job: Job) => {
+
+  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateJobDescription`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(job),
+  });
+
+  await response.json();
+  if (!response.ok) {
+    throw new Error('Failed to update job description');
+  }
+}
+
 const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
   job,
   open,
   onClose,
 }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const [jobState, updateJobState] = useState(job);
+  const [jobState, updateJobState] = useState<Job>(job);
+
+  useEffect(() => {
+    updateJobState(job);
+  }, [job]);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      onClose();
+      updateJobDesc(jobState)
     }
   };
+
+  useEffect(() => {
+
+    onClose();
+
+  }, [jobState]);
+
 
   const handleAddResponsibilityListItem = () => {
     const newResponsibilities = jobState.responsibilities.slice();
@@ -148,17 +184,13 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
     updateJobState({ ...jobState, responsibilities: newResponsibilities });
   };
 
-  const handleDeleteResponsibilityListItem = (index) => {
+  const handleDeleteResponsibilityListItem = (index: number) => {
     const newResponsibilities = jobState.responsibilities.filter(
       (_, i) => i !== index
     );
     console.log(newResponsibilities);
     updateJobState({ ...jobState, responsibilities: newResponsibilities });
   };
-
-  useEffect(() => {
-    updateJobState(job);
-  }, [job]);
 
   useEffect(() => {
     open
@@ -169,6 +201,10 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [open]);
+
+  if (!jobState) {
+    return null; // or a loading spinner
+  }
 
   return (
     <Modal open={open}>
@@ -257,20 +293,19 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             </div>
             <div id="responsibilities" className="pl-5">
               <ul className="list-disc space-y-2">
-                {jobState.responsibilities.map((r, i) => (
+                {jobState.responsibilities.map((r: string, i: number) => (
                   <ResponsibilityListItem
-                    key={i}
-                    content={r}
-                    onChange={(e) => {
-                      const newResponsibilities =
-                        jobState.responsibilities.slice();
-                      newResponsibilities[i] = e.target.value;
-                      updateJobState({
-                        ...jobState,
-                        responsibilities: newResponsibilities,
-                      });
-                    }}
-                    onDelete={() => handleDeleteResponsibilityListItem(i)}
+                  key={i}
+                  content={r}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    const newResponsibilities = jobState.responsibilities.slice();
+                    newResponsibilities[i] = e.target.value;
+                    updateJobState({
+                    ...jobState,
+                    responsibilities: newResponsibilities,
+                    });
+                  }}
+                  onDelete={() => handleDeleteResponsibilityListItem(i)}
                   />
                 ))}
               </ul>
@@ -387,12 +422,40 @@ const JobDescriptionCard: React.FC<JobDescriptionCardProps> = ({
   );
 };
 
+const getJobDescs = async (setter: { (value: React.SetStateAction<Job[]>): void; (arg0: any): void; }) => {
+
+  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllJobDescriptions`)
+  
+  console.log(response)
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch job descriptions")
+  }
+
+  const data = await response.json();
+  setter(data);
+  console.log("Data gotten and saved")
+}
+
+
 const JobDescriptions = () => {
+  const [allJobDescriptions, setJobDescriptions] = useState<Job[]>([]);
   const [currentJobDesc, setCurrentJobDesc] = useState<Job>(emptyJob);
   const [modalState, setModalState] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   const editButtonRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    getJobDescs(setJobDescriptions);
+  }, [modalState]);
+
+  useEffect(() => {
+
+    if (currentJobDesc._id) {
+      setModalState(true);
+    }
+  }, [currentJobDesc])
 
   useEffect(() => {
 
@@ -405,22 +468,6 @@ const JobDescriptions = () => {
     }
 
   }, [isEditing])
-
-  const openJobDescriptionModal: (job: Job) => void = (job) => {
-    setCurrentJobDesc(job);
-    setModalState(true);
-  };
-
-  const handleJobDescriptionCardClick: (job: Job) => void = (job) => {
-    
-    if (isEditing) {
-      console.log('Editing job description');
-      openJobDescriptionModal(job)
-    } else {
-      console.log('Open analysis page')
-    }
-  }
-
 
   return (
     <div
@@ -475,16 +522,29 @@ const JobDescriptions = () => {
           </div>
         </div>
         <div id="body-body" className="grid grid-rows-3 grid-cols-4 gap-5">
-          <JobDescriptionCard
-            job={testJob}
-            onClick={() => handleJobDescriptionCardClick(testJob)}
-          />
+          {
+            allJobDescriptions.map((job, i) => (
+              <JobDescriptionCard
+                key={i}
+                job={job}
+                onClick={() =>{
+                  if (isEditing) {
+                    setCurrentJobDesc(job);
+                  } else {
+                    console.log('Open analysis page')
+                  }
+                }}
+              />
+            ))
+          }
         </div>
       </div>
       <JobDescriptionModal
         job={currentJobDesc}
         open={modalState}
-        onClose={() => setModalState(false)}
+        onClose={() => {
+          setModalState(false)
+        }}
       />
     </div>
   );
