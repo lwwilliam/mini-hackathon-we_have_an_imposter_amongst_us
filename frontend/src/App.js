@@ -5,6 +5,7 @@ import Test1 from './view/test1/test1';
 import Test2 from './view/test2/test2';
 import JobDescriptions from './view/jobDescriptions/jobDescriptions.tsx';
 
+import JobResume from './view/jobResume/JobResume.jsx'
 import Resume from './view/resume/Resume';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path='/test2' element={<Test2/>} />
         <Route path='/resume' element={<Resume />} />
         <Route path='/job' element={<JobDescriptions/>} />
+        <Route path='/job/analysis' element={< JobResume />} />
       </Routes>
     </Router>
   );
