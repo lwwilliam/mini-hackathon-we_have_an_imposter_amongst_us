@@ -51,11 +51,13 @@ const QualificationBean: React.FC<QualificationBeanProps> = ({
 interface modifiableBeanProps {
   qualification: Qualification;
   onClose: (newQualification: Qualification) => void;
+  onDelete: () => void;
 }
 
 const ModifiableQualificationBean: React.FC<modifiableBeanProps> = ({
   qualification,
-  onClose
+  onClose,
+  onDelete
 }) => {
   const elemRef = useRef<HTMLDivElement | null>(null)
   const [ editing, setEdit ] = useState<Boolean>(false)
@@ -125,6 +127,8 @@ const ModifiableQualificationBean: React.FC<modifiableBeanProps> = ({
           name: e.currentTarget.innerText
         })}
         >{data.name}</span>
+
+        <button className='bg-white border-solid border-1 border-black px-3 rounded-xl' onClick={onDelete}>X</button>
       </div> )
     : 
     <QualificationBean qualification={qualification} />)
@@ -194,6 +198,19 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
   const handleModifyQualification = (qualification: qualifications, i: number) => (newQualification: Qualification) => {
     const newQualifications = jobState.qualifications[qualification].slice();
     newQualifications[i] = newQualification
+    updateJobState({ 
+      ...jobState,
+      qualifications: {
+        ...jobState.qualifications,
+        [qualification]: newQualifications
+      }
+    })
+  }
+
+  const handleDeleteQualification = (qualification: qualifications, index: number) => () => {
+    const newQualifications = jobState.qualifications[qualification].filter(
+      (_, i) => i !== index
+    );
     updateJobState({ 
       ...jobState,
       qualifications: {
@@ -366,7 +383,9 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
                 <ModifiableQualificationBean 
                 key={i} 
                 qualification={x} 
-                onClose={handleModifyQualification('pastExperience', i)}/>
+                onClose={handleModifyQualification('pastExperience', i)}
+                onDelete={handleDeleteQualification('pastExperience', i)}
+                />
               ))}
             </div>
             <div className="flex flex-row justify-between items-center">
@@ -385,7 +404,8 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             <div className="flex flex-wrap items-start">
               {jobState.qualifications.technical.map((x, i) => (
                 <ModifiableQualificationBean key={i} qualification={x} 
-                onClose={handleModifyQualification('technical', i)}/>
+                onClose={handleModifyQualification('technical', i)}
+                onDelete={handleDeleteQualification('technical', i)}/>
               ))}
             </div>
             <div className="flex flex-row justify-between items-center">
@@ -404,7 +424,8 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             <div className="flex flex-wrap items-start">
               {jobState.qualifications.soft.map((x, i) => (
                 <ModifiableQualificationBean key={i} qualification={x} 
-                onClose={handleModifyQualification('soft', i)}/>
+                onClose={handleModifyQualification('soft', i)}
+                onDelete={handleDeleteQualification('soft', i)}/>
               ))}
             </div>
           </div>
