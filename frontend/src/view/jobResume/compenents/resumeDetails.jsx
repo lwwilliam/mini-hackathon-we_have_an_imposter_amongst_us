@@ -95,7 +95,7 @@ const SoftSkillMatched = ({ matched }) => {
 
 const QualificationMatched = ({ qualifications }) => {
   return (
-  <div className="flex flex-col gap-2">
+  <div className="flex flex-col gap-5">
       <div className="flex justify-between">
         <h1 className="text-3xl">Qualification Method</h1>
         <div className="flex gap-5">
@@ -199,7 +199,7 @@ const ResumeDetails = () => {
 
   return (
     <div
-    className="flex flex-col flex-1 bg-white rounded-xl p-5 gap-5"
+    className="flex flex-col flex-1 bg-white rounded-xl p-10 gap-5"
     >
       <div
       className="flex justify-between"
@@ -210,7 +210,7 @@ const ResumeDetails = () => {
           <DownloadAnalysis />
         </div>
       </div>
-      <div className="flex flex-col overflow-auto gap-2">
+      <div className="flex flex-col overflow-auto gap-5">
         <ResumeSummary summary={mockd.summary}/>
         <ResumeHighlights highlights={mockd.highlights}/>
         <QualificationMatched qualifications={mockd.qualifications}/>
