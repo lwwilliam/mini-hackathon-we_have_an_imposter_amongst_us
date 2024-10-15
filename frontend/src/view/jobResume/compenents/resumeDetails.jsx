@@ -3,7 +3,7 @@ import React from "react";
 const CheckBox = ({on}) => {
   return (
     <div className={`border-solid border-2 flex ${on ? "bg-green-100 border-green-500" : "bg-red-500 border-red-900"} aspect-square h-full rounded-xl place-items-center`}>
-      <span className={`text-center flex-1 ${on ? 'text-green-700' : 'text-white'}`}>
+      <span className={`text-center flex-1 ${on ? 'text-green-700' : 'text-white text-xl'}`}>
         {on ? "✔": "X"}
       </span>
     </div>
@@ -187,12 +187,12 @@ const ResumeDetails = () => {
           name: 'Good communication skills',
           priority: QualPriority.Normal,
           minYears: 0,
-          qualified: false,
+          qualified: true,
         },
         { name: 'Team player', priority: QualPriority.Normal, minYears: 0,
           qualified: false, },
         { name: 'Problem solver', priority: QualPriority.Normal, minYears: 0,
-          qualified: false, },
+          qualified: true, },
       ],
     }
   }
