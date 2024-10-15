@@ -49,11 +49,6 @@ const CandidateDetails = () => {
 const JobResume = () => {
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
-      {/* <div id="header" className='bg-[#1e1e1e]/[.58] w-screen h-16 flex gap-x-8 text-center'>
-        <div className="ml-[50px]"></div>
-        <a href="/resume" className="cursor-pointer my-4 mx-6 text-2xl text-white hover:underline">Resume</a>
-        <a href="/job" className="cursor-pointer my-4 mx-6 text-2xl text-white hover:underline">Job Descriptions</a>
-      </div> */}
       <PageHeader />
       <div id="body"
       className='flex mx-32 py-12 gap-14

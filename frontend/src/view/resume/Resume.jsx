@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import UploadPDFModal from './components/uploadPdf';
 import PageHeader from '../pageHeader/Header';
 
@@ -84,8 +83,6 @@ const ResumeTables = () => {
 // </div>
 
 const Resume = () => {
-  const nav = useNavigate()
-
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
       <PageHeader />
