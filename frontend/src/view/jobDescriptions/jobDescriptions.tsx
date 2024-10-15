@@ -7,6 +7,7 @@ import {
   QualPriority,
 } from '../../types';
 import { JobDescriptionModal } from './jobDescriptionModal';
+import PageHeader from '../pageHeader/typeHeader';
 
 const emptyJob: Job = {
   _id: '',
@@ -138,12 +139,12 @@ const updateJobDesc = async (job: Job) => {
 const getJobDescs = async (setter: { (value: React.SetStateAction<Job[]>): void; (arg0: any): void; }) => {
 
   const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllJobDescriptions`)
-  
-  
+
+
   if (!response.ok) {
     throw new Error("Failed to fetch job descriptions")
   }
-  
+
   const data = await response.json();
   console.log(response)
   setter(data);
@@ -187,7 +188,7 @@ const JobDescriptions = () => {
       id="main"
       className="bg-gradient-to-b from-[#E8E8E8] to-[#F4D2FF] w-screen h-screen flex flex-col"
     >
-      <div id="header" className="bg-black/60 w-screen h-16 flex"></div>
+      <PageHeader />
       <div id="body" className="flex flex-col mx-32">
         <div id="body-header" className="flex flex-row justify-between py-12">
           <div

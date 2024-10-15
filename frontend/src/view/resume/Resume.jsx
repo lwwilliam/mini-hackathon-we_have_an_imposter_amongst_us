@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UploadPDFModal from './components/uploadPdf';
+import PageHeader from '../pageHeader/Header';
 
 const SearchBar = () => {
   return (
     <div className='flex flex-1 gap-5'>
-      <input 
+      <input
       type='text' placeholder='Search By Candidate Name'
       className='flex-1 rounded-3xl pl-5 border-2 border-solid border-[#57116F]'
       />
@@ -87,9 +88,7 @@ const Resume = () => {
 
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
-      <div id="header" className='bg-black/60 w-screen h-16 flex'>
-
-			</div>
+      <PageHeader />
       <div id="body" className='flex flex-col mx-32 py-12 flex-1 gap-12 overflow-hidden'>
         <div className='flex space-x-0 gap-96'>
           <h1 className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl">Resumes</h1>
