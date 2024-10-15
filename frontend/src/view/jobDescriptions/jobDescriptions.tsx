@@ -7,6 +7,7 @@ import {
   QualPriority,
 } from '../../types';
 import { JobDescriptionModal } from './jobDescriptionModal';
+import { useNavigate } from 'react-router-dom';
 
 const emptyJob: Job = {
   _id: '',
@@ -152,6 +153,7 @@ const getJobDescs = async (setter: { (value: React.SetStateAction<Job[]>): void;
 
 
 const JobDescriptions = () => {
+  const nav = useNavigate()
   const [allJobDescriptions, setJobDescriptions] = useState<Job[]>([]);
   const [currentJobDesc, setCurrentJobDesc] = useState<Job>(emptyJob);
   const [modalState, setModalState] = useState(false);
@@ -244,7 +246,7 @@ const JobDescriptions = () => {
                   if (isEditing) {
                     setCurrentJobDesc(job);
                   } else {
-                    console.log('Open analysis page')
+                    nav("/job/analysis")
                   }
                 }}
               />
