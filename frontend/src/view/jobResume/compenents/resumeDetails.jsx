@@ -158,10 +158,10 @@ const ResumeDetails = ({viewing}) => {
           className="flex justify-between"
           >
             <h1 className="font-light text-6xl place-content-center">{viewing.name}</h1>
-            <div className="flex gap-2 items-center">
+            {/* <div className="flex gap-2 items-center">
               <DownloadPDF />
               <DownloadAnalysis />
-            </div>
+            </div> */}
           </div>
           <div className="flex flex-col overflow-auto gap-5">
             <ResumeSummary summary={viewing.summary}/>

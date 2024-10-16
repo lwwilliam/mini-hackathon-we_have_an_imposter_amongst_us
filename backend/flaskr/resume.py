@@ -12,9 +12,11 @@ from .tagsAPI import getAllTags
 from collections import namedtuple
 from bson import ObjectId
 from io import BytesIO
+from collections import defaultdict
 
 load_dotenv()
 DB_USER = os.environ.get("DB_USER")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 UPLOAD_FOLDER = 'pdfUploads'
 
@@ -79,7 +81,7 @@ def fetch_tags():
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
-tags_json = '{"name": "candidate name", "tag_ids": ["tagid1", "tagid2", "tagid3"]}'
+tags_json = '{"name": "candidate name", "github": "github username", "tag_ids": ["tagid1", "tagid2", "tagid3"]}'
 
 @api_bp.route('/ai', methods=['POST'])
 def openAI():
@@ -106,7 +108,8 @@ def openAI():
                         "content": "You are a HR that takes in a resume as text, your job is to match which tags best suits the resume. The tags will be passed to you in json form\n"
                         f"The JSON object you return will be in this format:\n{tags_json}\n"
                         "the return JSON object must have between 1 to 3 _id in an array form and only the id, and also the candidate name from the resume\n"
-                        f"Here are the tag name, _id and description:\n{fetch_tags()}\n",
+                        f"Here are the tag name, _id and description:\n{fetch_tags()}\n"
+                        "if \"github\" / name cant be found remove the field",
                         # "response_format": {"type": "json_object"}
                     },
                     {
@@ -255,7 +258,7 @@ def analyseSingleResume(resume, jobDescription):
                     "content": "You are a hr that takes in a resume as a string, extract and summarize its information and outputs it in JSON.\n"
                     f" The JSON object must use the schema:\n{analysis_json}\n"
                     f"\n The new json should follow the base of the qualifications from this object:\n{jobDescription}\n"
-                    "you have to check whether each qualifications are fulfilled by the resume and change the \'qualified\' field to true / false boolean accordingly",
+                    "you have to check whether each qualifications are fulfilled by the resume and change the \'qualified\' field to true / false boolean accordingly\n",
                     # "response_format": {"type": "json_object"}
                 },
                 {
@@ -315,3 +318,34 @@ def get_job_analysis():
     #     "message": f"Analysis for job ID: {job_id}",
     #     # "job_id": job
     # })
+
+@api_bp.route('/github', methods=['GET'])
+def github():
+    username = request.args.get('username')
+    if username is None:
+        return jsonify({"error": "username non existent"}), 400
+    headers = {
+        'Authorization': f'token {GITHUB_TOKEN}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
+
+    # Get the user's public repositories
+    repos_url = f'https://api.github.com/users/{username}/repos?type=public'
+    repos_response = requests.get(repos_url, headers=headers)
+    repos = repos_response.json()
+
+    language_lines = defaultdict(int)  # Dictionary to hold lines of code by language
+
+    # Iterate through each repository
+    for repo in repos:
+        # Get the languages for each repository
+        languages_url = repo['languages_url']
+        print("url: " + languages_url)
+        languages_response = requests.get(languages_url, headers=headers)
+        languages = languages_response.json()
+
+        # Sum the lines of code for each language
+        for language, lines in languages.items():
+            language_lines[language] += lines
+
+    return jsonify(language_lines), 200
