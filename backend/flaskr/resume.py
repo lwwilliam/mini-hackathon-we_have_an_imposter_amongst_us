@@ -37,12 +37,11 @@ client = AzureOpenAI(
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-def storePDF(file, data):
+def storePDF(file):
     original_filename = file.filename
     pdf_entry = {
-        "original_filename": original_filename,
-        **data
-   }
+        "original_filename": original_filename
+    }
 
     inserted_id = pdf_collection.insert_one(pdf_entry).inserted_id
 
@@ -54,6 +53,20 @@ def storePDF(file, data):
         {"_id": inserted_id},
         {"$set": {"stored_filename": new_filename}}
     )
+    return inserted_id
+
+def tagsToPDF(data, inserted_id):
+    print(inserted_id)
+    print(data)
+    pdf_entry = {
+        **data
+    }
+
+    pdf_collection.update_one(
+        {"_id": inserted_id},
+        {"$set": pdf_entry}
+    )
+
 
 def fetch_tags():
     try:
@@ -80,14 +93,11 @@ def openAI():
         return jsonify({"error": "No selected file"}), 400
 
     if file:
+        id = storePDF(file)
         reader = PdfReader(file)
         extract_text = ""
         for page in reader.pages:
             extract_text += page.extract_text()
-        # reader = PdfReader(file)
-        # page = reader.pages[0]
-        # extract_text = page.extract_text()
-        #print(extract_text)
         try:
             chat_completion = client.chat.completions.create(
                 messages=[
@@ -108,10 +118,8 @@ def openAI():
                 model=MODEL_NAME,
                 response_format={"type": "json_object"},
             )
-            #print("HELLO")
-            storePDF(file, json.loads(chat_completion.choices[0].message.content))
-            #print(chat_completion.choices[0].message.content)
-            # return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
+            tagsToPDF(json.loads(chat_completion.choices[0].message.content), id)
+            # storePDF(file, json.loads(chat_completion.choices[0].message.content))
             return jsonify({"msg" : json.loads(chat_completion.choices[0].message.content)}), 200
         except Exception as e:
             print(e)
