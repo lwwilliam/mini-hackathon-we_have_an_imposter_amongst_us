@@ -7,3 +7,4 @@ openai==1.51.1
 groq==0.11.0
 pypdf==5.0.1
 colorama==0.4.6
+requests==2.32.3
