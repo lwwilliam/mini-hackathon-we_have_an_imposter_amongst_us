@@ -37,7 +37,7 @@ const JobDescriptionCard = ({
   return (
     <div
       id={job.title}
-      className="flex flex-col bg-white w-[20rem] h-[13rem] rounded-xl p-5
+      className="flex flex-col bg-white h-auto rounded-xl p-5
     transition duration-300 ease-in-out hover:shadow-xl hover:scale-105 overflow-auto"
       onClick={onClick}
     >
@@ -194,8 +194,9 @@ const JobDescriptions = () => {
   return (
     <div
       id="main"
-      className="bg-gradient-to-b from-[#E8E8E8] to-[#F4D2FF] w-screen h-screen flex flex-col"
+      className="w-screen h-screen flex flex-col"
     >
+      <div className="-z-10 bg-gradient-to-b from-[#E8E8E8] to-[#F4D2FF] w-screen h-screen fixed"></div>
       <JDUploader 
       open={jdmodelState} 
       onClose={
