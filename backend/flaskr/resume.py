@@ -1,4 +1,3 @@
-import requests
 from flask import jsonify, request, make_response, send_file
 import json
 from . import api_bp
@@ -9,6 +8,8 @@ from openai import AzureOpenAI
 from pypdf import PdfReader
 from colorama import Fore, Style
 from .tagsAPI import getAllTags
+from collections import namedtuple
+
 
 load_dotenv()
 DB_USER = os.environ.get("DB_USER")
@@ -116,10 +117,21 @@ jd_json = '{"title": "job title (string)","mode": "work location (string)","type
 def parseJD():
     # extract_text = request.get_json()['jobDescription']
     extract_text = ""
+    print(request.files)
     if 'File' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
 
+    if request.form.get('tags') is None:
+        return jsonify({"error": "No tags part in the request"}), 400
+
     file = request.files['File']
+
+    tagsData = request.form.to_dict(flat=True)['tags']
+    # tagsData = request.form.get('tags')
+    # tags = jsonify(tagsData)
+
+    # Parse JSON into an object with attributes corresponding to dict keys.
+    tags = tagsData.split(',')
 
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
@@ -150,7 +162,7 @@ def parseJD():
                 response_format={"type": "json_object"},
             )
             # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
-            jd_collection.insert_one(json.loads(chat_completion.choices[0].message.content))
+            jd_collection.insert_one({ **json.loads(chat_completion.choices[0].message.content), **{'tags': tags}})
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500

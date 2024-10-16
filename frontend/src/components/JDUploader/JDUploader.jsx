@@ -52,6 +52,7 @@ const JDUploader = ({ open, onClose }) => {
 		const url = `${process.env.REACT_APP_BACKEND_URL}/api/parseJD`
 		const formData = new FormData()
 		formData.append('File', file)
+		formData.append('tags', tagArray.map(val => val._id))
 
 		try {
 			setProcessing(true)
