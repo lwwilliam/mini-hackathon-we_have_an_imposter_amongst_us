@@ -67,7 +67,7 @@ const JobResume = () => {
     const jobResponse = await jobRequest.json()
 
     console.log(jobResponse)
-    setTitle(`Resume Matched for ${jobResponse.position}`)
+    setTitle(`Resume Matched for ${jobResponse.title}`)
     const qualificationArray = getQualifications(jobResponse.qualifications)
     const noQualify = qualificationArray.reduce((acc, value) => acc + value.length, 0)
 
