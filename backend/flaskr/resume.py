@@ -10,7 +10,7 @@ from pypdf import PdfReader
 from colorama import Fore, Style
 from .tagsAPI import getAllTags
 from collections import namedtuple
-
+from bson import ObjectId
 
 load_dotenv()
 DB_USER = os.environ.get("DB_USER")
@@ -194,3 +194,89 @@ def getResume():
         resume['_id'] = str(resume['_id'])
         resumes.append(resume)
     return jsonify(resumes), 200
+ 
+def getResumeWithTag(tags, job):
+    resumes = []
+
+    for resume in pdf_collection.find({}):
+        tag_ids = resume.get('tag_ids', [])
+
+    # Check if 'tag_ids' is a list before proceeding
+        if not isinstance(tag_ids, list):
+            continue  # Skip this resume if 'tag_ids' is not a list
+        for tag in tag_ids:
+            if tag in job['tags']:
+                resume['_id'] = str(resume['_id'])
+                resumes.append(resume)
+    return resumes
+
+
+analysis_json = '{   "name": "name",   "summary": "short summary of past experiences.",   "highlights": ["highlight1", "highlight2", "highlight3", "highlight4", "highlight5"],   "qualifications": {     "pastExperience": [       {         "name": "name of past experience",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       }     ],     "technical": [       {         "name": "name of technical skill",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       },     ],     "soft": [       {         "name": "name of soft skill",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       },     ]   } }'
+
+def analyseSingleResume(resume, jobDescription):
+    # extract_text = 
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a hr that takes in a resume as a string, extract and summarize its information and outputs it in JSON.\n"
+                    f" The JSON object must use the schema:\n{analysis_json}\n"
+                    f"\n The new json should follow the base of the qualifications from this object:\n{jobDescription}\n"
+                    "you have to check whether each qualifications are fulfilled by the resume and change the \'qualified\' field to true / false boolean accordingly",
+                    # "response_format": {"type": "json_object"}
+                },
+                {
+                    "role": "user",
+                    "content": extract_text + "summarize and match the qualifications",
+                    # "response_format": {"type": "json_object"}
+                }
+            ],
+            model=MODEL_NAME,
+            response_format={"type": "json_object"},
+        )
+        # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
+        # json.loads(chat_completion.choices[0].message.content)
+        print(chat_completion.choices[0].message.content)
+        return json.loads(chat_completion.choices[0].message.content)
+    except Exception as e:
+        print(e)
+        return None
+
+@api_bp.route('/job/analysis', methods=['GET'])
+def get_job_analysis():
+    job_id = request.args.get('id')
+    if job_id is None:
+        return jsonify({"error": "Job ID is required"}), 400
+
+    # try:
+    #     # Convert job_id to ObjectId
+    #     job = jd_collection.find_one({"_id": job_id})
+    # except Exception as e:
+    #     return jsonify({"error": "Invalid Job ID format"}), 400
+    try:
+        object_id = ObjectId(job_id)
+        # print("Converted ObjectId:", object_id)
+        job = jd_collection.find_one({"_id": object_id})
+    except Exception as e:
+        print(f"Error: {e}")
+
+    resumes = getResumeWithTag(job['tags'], job)
+
+    analysisAll = []
+    for resume in resumes:
+        analysis = analyseSingleResume(resume, job)
+
+        if analysis is None:
+            print("ERROR ANALYSIS")
+            continue
+        analysis['_id'] = string(resume['_id'])
+        print("test")
+        print(analysis)
+        analysisAll.append(analysis)
+    # print(job)
+    return jsonify(analysisAll), 200
+    # return jsonify({
+    #     "message": f"Analysis for job ID: {job_id}",
+    #     # "job_id": job
+    # })
