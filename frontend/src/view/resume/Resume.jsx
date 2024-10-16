@@ -66,6 +66,7 @@ const ResumeTables = () => {
 
 
   const [allResume, setAllResume] = useState([]);
+  const [tags, setTags] = useState({});
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllResumes`, {
@@ -81,6 +82,30 @@ const ResumeTables = () => {
     });
   }, []);
 
+  function getTagsName(arr_id) {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getTags?tags=${arr_id}`, {
+      method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+      setTags(prevTags => ({
+        ...prevTags,
+        [arr_id]: data.join(", ")
+      }));
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  }
+
+  useEffect(() => {
+    allResume.forEach(val => {
+      if (val.tag_ids) {
+        getTagsName(val.tag_ids.join(", "));
+      }
+    });
+  }, [allResume]);
+
   return (
     <div className='flex flex-col gap-2 font-medium overflow-hidden'>
       <div className='flex flex-col overflow-hidden flex-1 rounded-xl'>
@@ -90,7 +115,7 @@ const ResumeTables = () => {
         </div>
 
         <div className='flex flex-col overflow-auto text-center flex-1 bg-white border-collapse'>
-          {allResume.map((val => val.name && <TableRowData name={val.name} positions={val.tag_ids ? val.tag_ids.join(", ") : ""} id={val._id} />))}
+          {allResume.map((val => val.name && <TableRowData name={val.name} positions={val.tag_ids ? tags[val.tag_ids.join(", ")] || "" : ""} id={val._id} />))}
         </div>
       </div>
     </div>

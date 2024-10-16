@@ -61,3 +61,17 @@ def getPdfWithTags():
     if not pdfs:
         return jsonify({"error": "No pdfs found with the tags"}), 404
     return jsonify(pdfs), 200
+
+@api_bp.route('/getTags', methods=['GET'])
+def getTags():
+    tags_array = request.args.get('tags')
+    arr = tags_array.split(',')
+    tagname_arr = []
+    for tag in arr:
+        tag = tag.strip()
+        tags_find = tags_collection.find_one({"_id": ObjectId(tag)})
+        if tags_find:
+            tagname_arr.append(tags_find['tag_name'])
+        else:
+            return jsonify({"error": "Tags not found"}), 404
+    return jsonify(tagname_arr), 209
