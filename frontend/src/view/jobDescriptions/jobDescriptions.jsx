@@ -60,10 +60,24 @@ const JobDescriptionCard = ({
   );
 };
 
+
+const getAllTags = async (setter) => {
+  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllTags`)
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch tags")
+  }
+
+  const data = await response.json();
+  
+  setter(data);
+
+}
+
+
 const getJobDescs = async (setter) => {
 
   const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllJobDescriptions`)
-
 
   if (!response.ok) {
     throw new Error("Failed to fetch job descriptions")
@@ -80,18 +94,26 @@ const JobDescriptions = () => {
   const [currentJobDesc, setCurrentJobDesc] = useState(emptyJob);
   const [modalState, setModalState] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
-
-
+  const [results, setResults] = useState([]);
+  
   const editButtonRef = useRef(null);
+
+  const filterButtonRef = useRef(null);
+  const [filterDropdown, setFilterDropdown] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
+  const dropdownRef = useRef(null);
+  const [tags, setTags] = useState([]);
+
   const [jdmodelState, setJdModalState] = useState(false)
 
   useEffect(() => {
+    getAllTags(setTags);
+
     getJobDescs(setJobDescriptions);
   }, []);
 
   useEffect(() => {
-    setSearchResults(allJobDescriptions)
+    setResults(allJobDescriptions)
   }, [allJobDescriptions])
 
   useEffect(() => {
@@ -125,8 +147,49 @@ const JobDescriptions = () => {
 
   const handleSearchInputChange = (e) => {
     const inputValue = e.target.value;
-    setSearchResults(filterByName(inputValue));
+    setResults(filterByName(inputValue));
   };
+
+  const handleFilterClick = () => {
+    if (filterButtonRef.current) {
+      const rect = filterButtonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 15,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setFilterDropdown(!filterDropdown);
+
+  };
+
+  const handleFilterOptionClick = (tag) => {
+
+    console.log("Filtering by tag: ", tag.tag_name)
+
+    // !! uncomment this when tags exist
+    // setResults(allJobDescriptions.filter((job) => job.tags.includes(tag._id)))
+  }
+
+  useEffect(() => {
+
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target) && !filterButtonRef.current.contains(e.target)) {
+        setFilterDropdown(false);
+      }
+    }
+
+    if (filterDropdown) {
+      document.addEventListener('click', handleClickOutside);
+    } else {
+      document.removeEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+
+  }, [filterDropdown])
+
 
   return (
     <div
@@ -163,9 +226,11 @@ const JobDescriptions = () => {
             />
             <div
               id="filter"
+              ref={filterButtonRef}
               className="flex flex-col ml-5 w-20 h-10 bg-[#57116F] rounded-full
             justify-center text-center text-white transition duration-150 ease-in-out
             hover:-translate-y-2 cursor-pointer"
+            onClick={handleFilterClick}
             >
               Filter
             </div>
@@ -192,7 +257,7 @@ const JobDescriptions = () => {
         </div>
         <div id="body-body" className="grid grid-rows-3 grid-cols-4 gap-5">
           {
-            searchResults.map((job, i) => (
+            results.map((job, i) => (
               <JobDescriptionCard
                 key={i}
                 job={job}
@@ -216,7 +281,32 @@ const JobDescriptions = () => {
           setModalState(false)
         }}
       />
+      {
+      filterDropdown && (
+          <div ref={dropdownRef} className='bg-white rounded-lg fixed z-50 space-y-2 p-2'
+          style={{ top: `${dropdownPosition.top}px`, right: `${dropdownPosition.right}px` }}>
+          <div className="flex flex-row justify-between items-center w-40 h-fit pl-5 hover:text-fuchsia-500 cursor-pointer"
+            onClick={() => {
+              setResults(allJobDescriptions);
+            }}>
+              All
+          </div>
+          {
+            tags.map((tag, i) => {
+                return (
+                  <div key={i} className="flex flex-row justify-between items-center w-40 h-fit pl-5 hover:text-fuchsia-500 cursor-pointer"
+                  onClick={() => handleFilterOptionClick(tag)}>
+                    {tag.tag_name}
+                  </div>
+                )
+              
+              })
+            }
+          </div>
+        )
+      }
     </div>
+    
   );
 };
 
