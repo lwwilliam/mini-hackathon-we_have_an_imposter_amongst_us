@@ -8,10 +8,11 @@ const SearchBar = () => {
     <div className='flex flex-1 gap-5'>
       <input
       type='text' placeholder='Search By Candidate Name'
-      className='flex-1 rounded-3xl pl-5 border-2 border-solid border-[#57116F] w-[25rem]'
+      className='flex-1 rounded-full pl-5 border-2 border-solid border-[#57116F] w-[25rem]'
       />
       <button
-      className='bg-[#57116F] text-white px-5 rounded-3xl'
+      className='bg-[#57116F] text-white px-5 rounded-full transition duration-150 ease-in-out
+            hover:-translate-y-2 cursor-pointer'
       >Filter</button>
     </div>
   )
@@ -34,7 +35,8 @@ const UploadButton = () => {
   return (
     <>
     <button
-      className='bg-[#57116F] text-white px-5 rounded-3xl'
+      className='bg-[#57116F] text-white px-5 rounded-full transition duration-150 ease-in-out
+            hover:-translate-y-2 cursor-pointer'
       onClick={openUploadPDFModal}
     >Upload</button>
     <ResumeUploader open={modelState} onClose={onClose} />

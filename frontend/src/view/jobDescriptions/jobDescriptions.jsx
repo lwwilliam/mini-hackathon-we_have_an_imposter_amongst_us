@@ -165,9 +165,9 @@ const JobDescriptions = () => {
   const handleFilterOptionClick = (tag) => {
 
     console.log("Filtering by tag: ", tag.tag_name)
+    console.log(allJobDescriptions)
 
-    // !! uncomment this when tags exist
-    // setResults(allJobDescriptions.filter((job) => job.tags.includes(tag._id)))
+    setResults(allJobDescriptions.filter((job) => job.tags ? job.tags.includes(tag._id) : false));
   }
 
   useEffect(() => {
@@ -294,9 +294,12 @@ const JobDescriptions = () => {
           </div>
           {
             tags.map((tag, i) => {
-                return (
+              return (
                   <div key={i} className="flex flex-row justify-between items-center w-40 h-fit pl-5 hover:text-fuchsia-500 cursor-pointer"
-                  onClick={() => handleFilterOptionClick(tag)}>
+                  onClick={() => {
+                    setFilterDropdown(false)
+                    handleFilterOptionClick(tag)
+                    }}>
                     {tag.tag_name}
                   </div>
                 )
