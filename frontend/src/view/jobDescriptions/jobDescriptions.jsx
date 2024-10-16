@@ -29,7 +29,7 @@ const JobDescriptionCard = ({
 }) => {
   const details = [job.mode, job.type, job.position].join(', ');
 
-  const skills = [job.qualifications.technical, job.qualifications.soft]
+  const skills = [...job.qualifications.technical, ...job.qualifications.soft]
     .slice(0, 3)
     .map((q) => q.name)
     .join(', ')
