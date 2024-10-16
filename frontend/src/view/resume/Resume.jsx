@@ -30,7 +30,7 @@ const UploadButton = () => {
       className='bg-[#57116F] text-white px-5 rounded-3xl'
       onClick={openUploadPDFModal}
     >Upload</button>
-    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={``}/>
+    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}api/ai`}/>
     </>
   )
 }
