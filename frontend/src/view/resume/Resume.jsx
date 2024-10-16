@@ -82,18 +82,17 @@ const ResumeTables = () => {
   }, []);
 
   return (
-    <div className='flex flex-col gap-2 font-medium'>
+    <div className='flex flex-col gap-2 font-medium overflow-hidden'>
       <div className='flex flex-col overflow-hidden flex-1 rounded-xl'>
         <div className='grid grid-cols-3 text-center bg-[#57116F] text-white py-1'>
           <div>Candidate Name</div>
           <div className='col-span-2'>Matched Job Description</div>
         </div>
 
-        <div className='grid grid-rows-14 overflow-auto text-center flex-1 bg-white border-collapse'>
+        <div className='flex flex-col overflow-auto text-center flex-1 bg-white border-collapse'>
           {allResume.map((val => <TableRowData name={val._id} positions={"test"} id={val._id} />))}
         </div>
       </div>
-      <p className='self-stretch text-right'>Page 1 of 13</p>
     </div>
 
   )
