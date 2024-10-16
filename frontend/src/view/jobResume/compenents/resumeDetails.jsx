@@ -1,4 +1,5 @@
 import React from "react";
+import { QualPriority } from "../../../constants";
 
 const CheckBox = ({on}) => {
   return (
@@ -8,12 +9,6 @@ const CheckBox = ({on}) => {
       </span>
     </div>
   )
-}
-
-const QualPriority = {
-  Normal: 'normal',
-  Mandatory: 'mandatory',
-  Bonus: 'bonus',
 }
 
 const QualificationBean = ({
@@ -35,11 +30,15 @@ const QualificationBean = ({
           className={`flex flex-row h-10 w-fit space-x-2 justify-center items-center bg-[${c}] border-[#57116F] border-[1px] rounded-full text-md px-5 py-1 text-center`}
         >
           <div className="text-md font-bold text-[#57116F]">{`${qualification.minYears}y+`}</div>
-          <div>{qualification.name}</div>
+          <div className="text-ellipsis overflow-hidden whitespace-nowrap">{qualification.name}</div>
         </div>
       ) : (
         <div
-          className={`h-10 w-fit justify-center items-center bg-[${c}] border-[#57116F] border-[1px] rounded-full text-md px-5 py-1 text-center`}
+          className={`
+            h-10 w-fit justify-center items-center bg-[${c}] 
+            border-[#57116F] border-[1px] rounded-full text-md px-5 py-1 text-center
+            text-ellipsis overflow-hidden whitespace-nowrap
+            `}
         >
           {qualification.name}
         </div>
@@ -135,16 +134,16 @@ const ResumeHighlights = ({highlights}) => {
 const DownloadPDF = () => {
   return (
     <button
-    className='flex-1 bg-[#57116F] text-white px-5 rounded-2xl'
-  >Download Raw PDF</button>
+    className='flex-1 bg-[#57116F] text-white px-5 py-2 whitespace-nowrap rounded-2xl'
+  >Download PDF</button>
   )
 }
 
 const DownloadAnalysis = () => {
   return (
     <button
-    className='flex-1 bg-[#57116F] text-white px-5 rounded-2xl'
-  >Download Analysed</button>
+    className='flex-1 bg-[#57116F] text-white px-5 py-2 whitespace-nowrap rounded-2xl'
+  >Download Analysis</button>
   )
 }
 
@@ -204,8 +203,8 @@ const ResumeDetails = () => {
       <div
       className="flex justify-between"
       >
-        <h1 className="font-light text-6xl">{mockd.name}</h1>
-        <div className="flex gap-2">
+        <h1 className="font-light text-6xl place-content-center">{mockd.name}</h1>
+        <div className="flex gap-2 items-center">
           <DownloadPDF />
           <DownloadAnalysis />
         </div>

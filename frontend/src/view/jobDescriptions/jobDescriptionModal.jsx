@@ -1,27 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Job,
-  JobMode,
-  JobType,
-  Qualification,
-  QualPriority,
-} from '../../types';
-
+import { QualPriority, JobMode, JobType } from '../../constants';
 import Modal from '../../components/Modal';
-import { useLocation } from 'react-router-dom';
 
-
-interface JobDescriptionModalProps {
-  job: Job;
-  open: boolean;
-  onClose: (job: Job) => void;
-}
-
-interface QualificationBeanProps {
-  qualification: Qualification;
-}
-
-const QualificationBean: React.FC<QualificationBeanProps> = ({
+const QualificationBean = ({
   qualification,
 }) => {
   let c = 'white';
@@ -48,13 +29,89 @@ const QualificationBean: React.FC<QualificationBeanProps> = ({
   );
 };
 
-interface ResponsibilityListItemProps {
-  content: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onDelete: () => void;
-}
+const ModifiableQualificationBean = ({
+  qualification,
+  onClose,
+  onDelete
+}) => {
+  const elemRef = useRef(null)
+  const [ editing, setEdit ] = useState(false)
+  const [ data, setData] = useState(qualification)
 
-const ResponsibilityListItem: React.FC<ResponsibilityListItemProps> = ({ content, onChange, onDelete }) => {
+  const yearRef = useRef(null)
+  const nameRef = useRef(null)
+
+  let c = 'white';
+
+  if (qualification.priority === QualPriority.Mandatory) {
+    c = '#FFCECE';
+  } else if (qualification.priority === QualPriority.Bonus) {
+    c = '#D8FFCE';
+  }
+
+  const handleClickOutside = (event) => {
+    if (elemRef.current && !elemRef.current.contains(event.target)) {
+      const newData = data
+
+      if (yearRef.current)
+        newData.minYears =  Number(yearRef.current.innerText)
+      if (nameRef.current)
+        newData.name = nameRef.current.innerText
+
+      onClose(newData)
+      setEdit(false)
+    }
+  };
+
+  useEffect(() => {
+    editing
+      ? document.addEventListener('mousedown', handleClickOutside)
+      : document.removeEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [editing, data]);
+
+  return (<div ref={elemRef} onClick={() => setEdit(true)}>
+    {(
+    editing ? (
+      <div
+        className={`flex flex-row h-10 w-fit mr-2 mb-2 space-x-2 
+          justify-center items-center bg-[${c}] 
+          border-[#57116F] border-[1px] rounded-full text-md px-5 py-1 text-center`}
+      >
+        <span
+        ref={yearRef}
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => setData({
+          ...data,
+          minYears: Number(e.currentTarget.innerText)
+        })}
+        className='text-md font-bold text-[#57116F]'
+        >{data.minYears}</span>
+        <span className='text-md font-bold text-[#57116F]'>y+</span>
+
+        <span
+        ref={nameRef}
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={(e) => setData({
+          ...data,
+          name: e.currentTarget.innerText
+        })}
+        >{data.name}</span>
+
+        <button className='bg-white border-solid border-1 border-black px-3 rounded-xl' onClick={onDelete}>X</button>
+      </div> )
+    : 
+    <QualificationBean qualification={qualification} />)
+    }</div>)
+  }
+
+
+const ResponsibilityListItem = ({ content, onChange, onDelete }) => {
   return (
     <li>
       <div className="flex flex-row justify-between w-full">
@@ -69,24 +126,114 @@ const ResponsibilityListItem: React.FC<ResponsibilityListItemProps> = ({ content
   );
 };
 
-const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
+const deleteJobDesc = async (job) => {
+
+  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteJobDescription?id=${job._id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  await response.json();
+
+  console.log(response)
+
+  if (!response.ok) {
+    throw new Error('Failed to delete job description');
+  }
+
+}
+
+const updateJobDesc = async (job) => {
+
+  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateJobDescription`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(job),
+  });
+
+  await response.json();
+
+  console.log(response)
+
+  if (!response.ok) {
+    throw new Error('Failed to update job description');
+  }
+}
+
+const JobDescriptionModal = ({
   job,
   open,
   onClose,
 }) => {
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const [jobState, updateJobState] = useState<Job>(job);
+  console.log(job.qualifications)
+
+  const modalRef = useRef(null);
+  const [jobState, updateJobState] = useState(job);
 
   useEffect(() => {
     updateJobState(job);
   }, [job]);
 
-  const handleClickOutside = async (event: MouseEvent) => {
+  const handleClickOutside = async (event) => {
 
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      await onClose(jobState);
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+        
+      await updateJobDesc(jobState)
+      onClose()
     }
   };
+
+  const handleDeleteJobDescription = async () => {
+
+    await deleteJobDesc(jobState)
+    onClose()
+
+  }
+
+  const handleAddQualification = (qualification) => {
+    const newQualifications = jobState.qualifications[qualification].slice();
+    newQualifications.push({
+      name: 'New Qualification',
+      priority: QualPriority.Normal,
+      minYears: 0
+    })
+    updateJobState({ 
+      ...jobState,
+      qualifications: {
+        ...jobState.qualifications,
+        [qualification]: newQualifications
+      }
+    })
+  }
+
+  const handleModifyQualification = (qualification, i) => (newQualification) => {
+    const newQualifications = jobState.qualifications[qualification].slice();
+    newQualifications[i] = newQualification
+    updateJobState({ 
+      ...jobState,
+      qualifications: {
+        ...jobState.qualifications,
+        [qualification]: newQualifications
+      }
+    })
+  }
+
+  const handleDeleteQualification = (qualification, index) => () => {
+    const newQualifications = jobState.qualifications[qualification].filter(
+      (_, i) => i !== index
+    );
+    updateJobState({ 
+      ...jobState,
+      qualifications: {
+        ...jobState.qualifications,
+        [qualification]: newQualifications
+      }
+    })
+  }
 
   const handleAddResponsibilityListItem = () => {
     const newResponsibilities = jobState.responsibilities.slice();
@@ -94,7 +241,7 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
     updateJobState({ ...jobState, responsibilities: newResponsibilities });
   };
 
-  const handleDeleteResponsibilityListItem = (index: number) => {
+  const handleDeleteResponsibilityListItem = (index) => {
     const newResponsibilities = jobState.responsibilities.filter(
       (_, i) => i !== index
     );
@@ -118,21 +265,25 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
         ref={modalRef}
         className="bg-white rounded-lg h-[50rem] w-[80rem] flex flex-col py-5 px-8 space-y-5 overflow-auto"
       >
-        <input
-          id="job-title"
-          placeholder="Job Title"
-          className="h-10 text-3xl font-bold"
-          value={jobState.title}
-          onChange={(e) =>
-            updateJobState({ ...jobState, title: e.target.value })
-          }
-        />
+        <div className='flex flex-row justify-between'>
+          <input
+            id="job-title"
+            placeholder="Job Title"
+            className="h-10 text-3xl font-bold"
+            value={jobState.title}
+            onChange={(e) =>
+              updateJobState({ ...jobState, title: e.target.value })
+            }
+          />
+          <img src='/trash.png' className='w-8 h-8 transition duration-150 hover:scale-125'
+          onClick={handleDeleteJobDescription}/>
+        </div>
         <div className="flex flex-row space-x-4">
           <select
             className=" bg-white border-[#57116F] border-[1px] rounded-full px-3 py-1"
             value={jobState.mode}
             onChange={(e) =>
-              updateJobState({ ...jobState, mode: e.target.value as JobMode })
+              updateJobState({ ...jobState, mode: e.target.value})
             }
           >
             <option value={JobMode.Onsite}>On-Site</option>
@@ -143,7 +294,7 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             className=" bg-white border-[#57116F] border-[1px] rounded-full px-3 py-1"
             value={jobState.type}
             onChange={(e) =>
-              updateJobState({ ...jobState, type: e.target.value as JobType })
+              updateJobState({ ...jobState, type: e.target.value})
             }
           >
             <option value={JobType.FullTime}>Full Time</option>
@@ -199,11 +350,11 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             </div>
             <div id="responsibilities" className="pl-5">
               <ul className="list-disc space-y-2">
-                {jobState.responsibilities.map((r: string, i: number) => (
+                {jobState.responsibilities.map((r, i) => (
                   <ResponsibilityListItem
                   key={i}
                   content={r}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                  onChange={(e) => {
                     const newResponsibilities = jobState.responsibilities.slice();
                     newResponsibilities[i] = e.target.value;
                     updateJobState({
@@ -241,13 +392,19 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
                 src="/plus.png"
                 className="w-8 h-8 transition duration-300 ease-in-out hover:rotate-90"
                 onClick={() => {
+                  handleAddQualification('pastExperience')
                   console.log('Add new education');
                 }}
               />
             </div>
             <div className="flex flex-wrap items-start">
               {jobState.qualifications.pastExperience.map((x, i) => (
-                <QualificationBean key={i} qualification={x} />
+                <ModifiableQualificationBean 
+                key={i} 
+                qualification={x} 
+                onClose={handleModifyQualification('pastExperience', i)}
+                onDelete={handleDeleteQualification('pastExperience', i)}
+                />
               ))}
             </div>
             <div className="flex flex-row justify-between items-center">
@@ -258,13 +415,16 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
                 src="/plus.png"
                 className="w-8 h-8 transition duration-300 ease-in-out hover:rotate-90"
                 onClick={() => {
+                  handleAddQualification('technical')
                   console.log('Add new technical');
                 }}
               />
             </div>
             <div className="flex flex-wrap items-start">
               {jobState.qualifications.technical.map((x, i) => (
-                <QualificationBean key={i} qualification={x} />
+                <ModifiableQualificationBean key={i} qualification={x} 
+                onClose={handleModifyQualification('technical', i)}
+                onDelete={handleDeleteQualification('technical', i)}/>
               ))}
             </div>
             <div className="flex flex-row justify-between items-center">
@@ -275,13 +435,16 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
                 src="/plus.png"
                 className="w-8 h-8 transition duration-300 ease-in-out hover:rotate-90"
                 onClick={() => {
+                  handleAddQualification('soft')
                   console.log('Add new soft');
                 }}
               />
             </div>
             <div className="flex flex-wrap items-start">
               {jobState.qualifications.soft.map((x, i) => (
-                <QualificationBean key={i} qualification={x} />
+                <ModifiableQualificationBean key={i} qualification={x} 
+                onClose={handleModifyQualification('soft', i)}
+                onDelete={handleDeleteQualification('soft', i)}/>
               ))}
             </div>
           </div>

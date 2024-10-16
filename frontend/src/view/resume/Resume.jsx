@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UploadPDFModal from './components/uploadPdf';
+import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
+import PageHeader from '../../components/pageHeader/Header.jsx';
 
 const SearchBar = () => {
   return (
     <div className='flex flex-1 gap-5'>
-      <input 
+      <input
       type='text' placeholder='Search By Candidate Name'
-      className='flex-1 rounded-3xl pl-5 border-2 border-solid border-[#57116F]'
+      className='flex-1 rounded-3xl pl-5 border-2 border-solid border-[#57116F] w-[25rem]'
       />
       <button
       className='bg-[#57116F] text-white px-5 rounded-3xl'
@@ -29,7 +30,7 @@ const UploadButton = () => {
       className='bg-[#57116F] text-white px-5 rounded-3xl'
       onClick={openUploadPDFModal}
     >Upload</button>
-    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} />
+    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={``}/>
     </>
   )
 }
@@ -83,17 +84,13 @@ const ResumeTables = () => {
 // </div>
 
 const Resume = () => {
-  const nav = useNavigate()
-
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
-      <div id="header" className='bg-black/60 w-screen h-16 flex'>
-
-			</div>
+      <PageHeader />
       <div id="body" className='flex flex-col mx-32 py-12 flex-1 gap-12 overflow-hidden'>
-        <div className='flex space-x-0 gap-96'>
+        <div className='flex space-x-0 justify-between'>
           <h1 className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl">Resumes</h1>
-          <div className='flex flex-1 gap-5 my-2'>
+          <div className='flex gap-5 my-2'>
             <SearchBar />
             <UploadButton />
           </div>

@@ -1,15 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Job,
-  JobMode,
-  JobType,
-  Qualification,
-  QualPriority,
-} from '../../types';
-import { JobDescriptionModal } from './jobDescriptionModal';
-import UploadModal from '../../components/jdPdfUpload/jdPdfUpload'
+import { QualPriority, JobMode, JobType } from '../../constants';
+import { JobDescriptionModal } from './jobDescriptionModal.jsx'
+import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
+import { useNavigate } from 'react-router-dom';
 
-const emptyJob: Job = {
+import PageHeader from '../../components/pageHeader/Header.jsx';
+
+const emptyJob = {
   _id: '',
   title: '',
   mode: JobMode.Remote,
@@ -25,62 +22,7 @@ const emptyJob: Job = {
   responsibilities: [],
 };
 
-const testJob: Job = {
-  _id: '1',
-  title: 'Product Engineer [PHP]',
-  mode: JobMode.Remote,
-  type: JobType.FullTime,
-  position: 'Associate',
-  location: 'Kuala Lumpur, Malaysia',
-  description:
-    'We are looking for a skilled, passionate, and highly motivated IT Product Engineer to involve in full Systems Development Life Cycle and provide support to the system users.\n\nWe require individuals who are strong believers in continuous improvement and are constantly driven to bring about positive change to processes.',
-  qualifications: {
-    pastExperience: [
-      {
-        name: 'Degree / Advanced Diploma in Computer Science or equivalent',
-        priority: QualPriority.Mandatory,
-        minYears: 0,
-      },
-    ],
-    technical: [
-      { name: 'Web Applications', priority: QualPriority.Normal, minYears: 0 },
-      {
-        name: 'RESTful APIs with JSON / XML',
-        priority: QualPriority.Normal,
-        minYears: 0,
-      },
-      { name: 'PHP V8', priority: QualPriority.Normal, minYears: 0 },
-      { name: 'Scrum', priority: QualPriority.Bonus, minYears: 0 },
-      {
-        name: 'System Design & Software Implementation',
-        priority: QualPriority.Normal,
-        minYears: 5,
-      },
-    ],
-    soft: [
-      {
-        name: 'Good communication skills',
-        priority: QualPriority.Normal,
-        minYears: 0,
-      },
-      { name: 'Team player', priority: QualPriority.Normal, minYears: 0 },
-      { name: 'Problem solver', priority: QualPriority.Normal, minYears: 0 },
-    ],
-  },
-  responsibilities: [
-    'Involve in R&D, design, implementation, integration, testing and deployment of software applications',
-    'Conducts, leads and coordinates a specific application module development activity',
-    'Provides technical experties and guidance to the development team',
-  ],
-};
-
-interface JobDescriptionCardProps {
-  job: Job;
-  onClick: () => void;
-}
-
-
-const JobDescriptionCard: React.FC<JobDescriptionCardProps> = ({
+const JobDescriptionCard = ({
   job,
   onClick,
 }) => {
@@ -95,7 +37,7 @@ const JobDescriptionCard: React.FC<JobDescriptionCardProps> = ({
     <div
       id={job.title}
       className="flex flex-col bg-white w-[20rem] h-[13rem] rounded-xl p-5
-    transition duration-300 ease-in-out hover:shadow-xl hover:scale-105"
+    transition duration-300 ease-in-out hover:shadow-xl hover:scale-105 overflow-auto"
       onClick={onClick}
     >
       <div id="title" className="text-xl font-bold text-center pb-5">
@@ -117,34 +59,15 @@ const JobDescriptionCard: React.FC<JobDescriptionCardProps> = ({
   );
 };
 
-const updateJobDesc = async (job: Job) => {
-
-  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateJobDescription`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(job),
-  });
-
-  await response.json();
-
-  console.log(response)
-
-  if (!response.ok) {
-    throw new Error('Failed to update job description');
-  }
-}
-
-const getJobDescs = async (setter: { (value: React.SetStateAction<Job[]>): void; (arg0: any): void; }) => {
+const getJobDescs = async (setter) => {
 
   const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllJobDescriptions`)
-  
-  
+
+
   if (!response.ok) {
     throw new Error("Failed to fetch job descriptions")
   }
-  
+
   const data = await response.json();
   console.log(response)
   setter(data);
@@ -153,17 +76,24 @@ const getJobDescs = async (setter: { (value: React.SetStateAction<Job[]>): void;
 
 
 const JobDescriptions = () => {
-  const [allJobDescriptions, setJobDescriptions] = useState<Job[]>([]);
-  const [currentJobDesc, setCurrentJobDesc] = useState<Job>(emptyJob);
+  const nav = useNavigate()
+  const [allJobDescriptions, setJobDescriptions] = useState([]);
+  const [currentJobDesc, setCurrentJobDesc] = useState(emptyJob);
   const [modalState, setModalState] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
 
-  const editButtonRef = useRef<HTMLDivElement | null>(null);
+
+  const editButtonRef = useRef(null);
   const [jdmodelState, setJdModalState] = useState(false)
 
   useEffect(() => {
     getJobDescs(setJobDescriptions);
   }, []);
+
+  useEffect(() => {
+    setSearchResults(allJobDescriptions)
+  }, [allJobDescriptions])
 
   useEffect(() => {
 
@@ -175,11 +105,11 @@ const JobDescriptions = () => {
   useEffect(() => {
 
     if (isEditing) {
-      editButtonRef.current!.style.backgroundColor = '#FF3737';
-      editButtonRef.current!.style.width = '7rem';
+      editButtonRef.current.style.backgroundColor = '#FF3737';
+      editButtonRef.current.style.width = '7rem';
     } else {
-      editButtonRef.current!.style.backgroundColor = '#57116F';
-      editButtonRef.current!.style.width = '5rem';
+      editButtonRef.current.style.backgroundColor = '#57116F';
+      editButtonRef.current.style.width = '5rem';
     }
 
   }, [isEditing])
@@ -188,13 +118,24 @@ const JobDescriptions = () => {
     setJdModalState(true)
   }
 
+  const filterByName = (query) => {
+    const filteredData = allJobDescriptions.filter((job) => job.title.toLowerCase().includes(query.toLowerCase()));
+
+    return (filteredData.length == 0) ? allJobDescriptions : filteredData;
+  };
+
+  const handleSearchInputChange = (e) => {
+    const inputValue = e.target.value;
+    setSearchResults(filterByName(inputValue));
+  };
+
   return (
     <div
       id="main"
       className="bg-gradient-to-b from-[#E8E8E8] to-[#F4D2FF] w-screen h-screen flex flex-col"
     >
-      <UploadModal open={jdmodelState} onClose={() => setJdModalState(false)} />
-      <div id="header" className="bg-black/60 w-screen h-16 flex"></div>
+      <UploadPDFModal open={jdmodelState} onClose={() => setJdModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}/api/parseJD`}/>
+      <PageHeader />
       <div id="body" className="flex flex-col mx-32">
         <div id="body-header" className="flex flex-row justify-between py-12">
           <div
@@ -211,7 +152,8 @@ const JobDescriptions = () => {
               type="text"
               placeholder="Search"
               className="w-[25rem] h-10 justify-center align-middle bg-white border-[#57116F] border-2 rounded-full
-            pl-5"
+              pl-5"
+              onChange={handleSearchInputChange}
             />
             <div
               id="filter"
@@ -244,7 +186,7 @@ const JobDescriptions = () => {
         </div>
         <div id="body-body" className="grid grid-rows-3 grid-cols-4 gap-5">
           {
-            allJobDescriptions.map((job, i) => (
+            searchResults.map((job, i) => (
               <JobDescriptionCard
                 key={i}
                 job={job}
@@ -252,7 +194,7 @@ const JobDescriptions = () => {
                   if (isEditing) {
                     setCurrentJobDesc(job);
                   } else {
-                    console.log('Open analysis page')
+                    nav("/job/analysis")
                   }
                 }}
               />
@@ -263,8 +205,7 @@ const JobDescriptions = () => {
       <JobDescriptionModal
         job={currentJobDesc}
         open={modalState}
-        onClose={async (job) => {
-          await updateJobDesc(job);
+        onClose={async () => {
           await getJobDescs(setJobDescriptions);
           setModalState(false)
         }}
