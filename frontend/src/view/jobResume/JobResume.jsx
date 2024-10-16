@@ -32,7 +32,7 @@ const CandidateDetails = ({tableData, maxValue}) => {
             <div className="flex-1">
               Data is Loading...
             </div>
-          ) 
+          )
         }
       </div>
     </div>
@@ -51,7 +51,7 @@ const JobResume = () => {
   console.log(jobid)
 
   const getQualifications = (qualifyObject) => [qualifyObject.pastExperience, qualifyObject.soft, qualifyObject.technical]
-  
+
   const getData = async () => {
     const jobRequest = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getJobDescription?id=${jobid}`)
     const jobResponse = await jobRequest.json()
@@ -66,7 +66,7 @@ const JobResume = () => {
 
     const request = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/job/analysis?id=${jobid}`)
     const response = await request.json()
-    
+
     console.log(response)
     const newTableData = response.map((cand) => {
       const candidateQualification = getQualifications(cand.qualifications)
@@ -87,7 +87,7 @@ const JobResume = () => {
     setResults(response)
     setViewing(response[0])
   }
- 
+
   useEffect(() => {
     getData()
   }, [])
@@ -100,7 +100,7 @@ const JobResume = () => {
       flex-1 overflow-hidden'>
         <div className="flex flex-col gap-12 flex-1">
           <h1
-          className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl">
+          className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl pb-10">
             {title}
             </h1>
           <CandidateDetails tableData={tableData} maxValue={maxQua}/>
