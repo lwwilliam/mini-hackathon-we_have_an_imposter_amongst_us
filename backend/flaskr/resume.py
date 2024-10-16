@@ -166,10 +166,6 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-<<<<<<< HEAD:backend/flaskr/openAI.py
-
-# @api_bp.route('/analysis', methods=['get'])
-=======
 
 
 @api_bp.route('/getPDF', methods=['GET'])
