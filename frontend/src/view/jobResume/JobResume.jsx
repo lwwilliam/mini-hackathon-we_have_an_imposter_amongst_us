@@ -62,7 +62,7 @@ const JobResume = () => {
     setViewing(results[index])
   }
 
-  const getData = async () => {
+  const getJobData = async () => {
     const jobRequest = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getJobDescription?id=${jobid}`)
     const jobResponse = await jobRequest.json()
 
@@ -73,7 +73,9 @@ const JobResume = () => {
 
     console.log(noQualify)
     setMaxQua(noQualify)
+  }
 
+  const getCandidateData = async () => {
     const request = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/job/analysis?id=${jobid}`)
     const response = await request.json()
 
@@ -99,7 +101,8 @@ const JobResume = () => {
   }
 
   useEffect(() => {
-    getData()
+    getJobData()
+    getCandidateData()
   }, [])
 
   return (

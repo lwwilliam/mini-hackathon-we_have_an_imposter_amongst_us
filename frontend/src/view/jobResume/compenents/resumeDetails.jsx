@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { QualPriority } from "../../../constants";
 
 const CheckBox = ({on}) => {
@@ -116,6 +116,46 @@ const QualificationMatched = ({ qualifications }) => {
   )
 }
 
+const GithubHighlights = ({ gitusername, disabled }) => {
+  const [ data, setData ] = useState(undefined)
+  const getData = async () => {
+    const request = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/github?username=${gitusername}`)
+    const response = await request.json()
+
+    console.log(response)
+    setData(response)
+  }
+
+  useEffect(() => {
+    getData()
+  }, [])
+
+  return (
+  <div className="flex flex-col gap-2">
+      <h1 className="text-3xl">GitHub Statistic</h1>
+
+      {
+        (disabled) ? 
+        (
+          <div>Cant find a username!</div>
+        ) :
+        (
+          <ul className="list-disc list-inside">
+          { data ? 
+            Object.entries(data).map(([prog, count], index) => 
+            <li key={index} className="list-item">{prog}: {count} lines</li>
+          ) : (
+            <div>Crunching Data...</div>
+          ) 
+          }
+         </ul>
+        )
+      }
+
+  </div>
+  )
+}
+
 const ResumeHighlights = ({highlights}) => {
   return (
   <div className="flex flex-col gap-2">
@@ -148,6 +188,7 @@ const DownloadAnalysis = () => {
 }
 
 const ResumeDetails = ({viewing}) => {
+  console.log(viewing)
   return (
     <div
     className="flex flex-col flex-1 bg-white rounded-xl p-10 gap-5"
@@ -166,6 +207,7 @@ const ResumeDetails = ({viewing}) => {
           <div className="flex flex-col overflow-auto gap-5">
             <ResumeSummary summary={viewing.summary}/>
             <ResumeHighlights highlights={viewing.highlights}/>
+            <GithubHighlights gitusername={viewing.github} disabled={!viewing.github}/>
             <QualificationMatched qualifications={viewing.qualifications}/>
           </div>
         </>) : (<div>Loading Data...</div>)

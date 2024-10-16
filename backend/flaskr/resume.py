@@ -249,7 +249,12 @@ def analyseSingleResume(resume, jobDescription):
     print(len(reader.pages))
     for page in reader.pages:
         extract_text += page.extract_text()
-    
+
+    if (resume.get('github')):
+        githubusername = resume.get('github')
+    else:
+        githubusername = ''
+
     try:
         chat_completion = client.chat.completions.create(
             messages=[
@@ -273,7 +278,7 @@ def analyseSingleResume(resume, jobDescription):
         # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
         # json.loads(chat_completion.choices[0].message.content)
         print(chat_completion.choices[0].message.content)
-        return json.loads(chat_completion.choices[0].message.content)
+        return {**json.loads(chat_completion.choices[0].message.content), **{'github': githubusername}}
     except Exception as e:
         print(e)
         return None
