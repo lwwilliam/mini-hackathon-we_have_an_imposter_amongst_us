@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { QualPriority, JobMode, JobType } from '../../constants';
-import { JobDescriptionModal } from './jobDescriptionModal';
+import { JobDescriptionModal } from './jobDescriptionModal.jsx'
 import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
 import { useNavigate } from 'react-router-dom';
 
