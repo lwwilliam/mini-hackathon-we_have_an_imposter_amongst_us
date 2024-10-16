@@ -207,7 +207,15 @@ def getResume():
         resume['_id'] = str(resume['_id'])
         resumes.append(resume)
     return jsonify(resumes), 200
- 
+
+def getAllResume():
+    resumes = []
+
+    for resume in pdf_collection.find({}):
+        resume['_id'] = str(resume['_id'])
+        resumes.append(resume)
+    return resumes
+
 def getResumeWithTag(tags, job):
     resumes = []
 
@@ -285,7 +293,10 @@ def get_job_analysis():
     except Exception as e:
         print(f"Error: {e}")
 
-    resumes = getResumeWithTag(job['tags'], job)
+    if (job.get('tags') and isinstance(job['tags'], list) and len(job['tags'])):
+        resumes = getResumeWithTag(job['tags'], job)
+    else:
+        resumes = getAllResume()
 
     analysisAll = []
     for resume in resumes:
