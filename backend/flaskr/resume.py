@@ -1,9 +1,4 @@
-<<<<<<< HEAD:backend/flaskr/openAI.py
-from flask import jsonify, request
-import requests
-=======
 from flask import jsonify, request, make_response, send_file
->>>>>>> 9343a56d09855e7a25a7f3a563777810d0dddc7a:backend/flaskr/resume.py
 import json
 from . import api_bp
 import os
