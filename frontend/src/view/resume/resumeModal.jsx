@@ -56,10 +56,10 @@ const DisplayPDFModal = ({ open, onClose, id }) => {
   return (
     <Modal open={open}>
       <div ref={modalRef}
-        className='bg-white rounded-lg h-[50rem] w-[40rem]
+        className='bg-[#ffffff] rounded-lg p-2 h-[58rem] w-[48rem]
         flex flex-col justify-center items-center'
       >
-        <embed ref={embedRef} />
+        <embed ref={embedRef} width="100%" height="100%"/>
       </div>
     </Modal>
   )
