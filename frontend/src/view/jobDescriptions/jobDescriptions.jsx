@@ -37,7 +37,7 @@ const JobDescriptionCard = ({
     <div
       id={job.title}
       className="flex flex-col bg-white w-[20rem] h-[13rem] rounded-xl p-5
-    transition duration-300 ease-in-out hover:shadow-xl hover:scale-105"
+    transition duration-300 ease-in-out hover:shadow-xl hover:scale-105 overflow-auto"
       onClick={onClick}
     >
       <div id="title" className="text-xl font-bold text-center pb-5">
@@ -58,25 +58,6 @@ const JobDescriptionCard = ({
     </div>
   );
 };
-
-const updateJobDesc = async (job) => {
-
-  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateJobDescription`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(job),
-  });
-
-  await response.json();
-
-  console.log(response)
-
-  if (!response.ok) {
-    throw new Error('Failed to update job description');
-  }
-}
 
 const getJobDescs = async (setter) => {
 
@@ -100,12 +81,15 @@ const JobDescriptions = () => {
   const [currentJobDesc, setCurrentJobDesc] = useState(emptyJob);
   const [modalState, setModalState] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+
 
   const editButtonRef = useRef(null);
   const [jdmodelState, setJdModalState] = useState(false)
 
   useEffect(() => {
     getJobDescs(setJobDescriptions);
+    setSearchResults(allJobDescriptions)
   }, []);
 
   useEffect(() => {
@@ -131,6 +115,21 @@ const JobDescriptions = () => {
     setJdModalState(true)
   }
 
+  const filterByName = (query) => {
+    const filteredData = allJobDescriptions.filter((job) => job.title.toLowerCase().includes(query.toLowerCase()));
+
+    if (filteredData.length == 0) {
+      filteredData = allJobDescriptions;
+    }
+
+    return filteredData;
+  };
+
+  const handleSearchInputChange = (e) => {
+    const inputValue = e.target.value;
+    setSearchResults(filterByName(inputValue));
+  };
+
   return (
     <div
       id="main"
@@ -154,7 +153,8 @@ const JobDescriptions = () => {
               type="text"
               placeholder="Search"
               className="w-[25rem] h-10 justify-center align-middle bg-white border-[#57116F] border-2 rounded-full
-            pl-5"
+              pl-5"
+              onChange={handleSearchInputChange}
             />
             <div
               id="filter"
@@ -187,7 +187,7 @@ const JobDescriptions = () => {
         </div>
         <div id="body-body" className="grid grid-rows-3 grid-cols-4 gap-5">
           {
-            allJobDescriptions.map((job, i) => (
+            searchResults.map((job, i) => (
               <JobDescriptionCard
                 key={i}
                 job={job}
@@ -206,8 +206,7 @@ const JobDescriptions = () => {
       <JobDescriptionModal
         job={currentJobDesc}
         open={modalState}
-        onClose={async (job) => {
-          await updateJobDesc(job);
+        onClose={async () => {
           await getJobDescs(setJobDescriptions);
           setModalState(false)
         }}

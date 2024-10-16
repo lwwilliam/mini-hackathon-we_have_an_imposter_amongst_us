@@ -126,6 +126,44 @@ const ResponsibilityListItem = ({ content, onChange, onDelete }) => {
   );
 };
 
+const deleteJobDesc = async (job) => {
+
+  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/deleteJobDescription?id=${job._id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  await response.json();
+
+  console.log(response)
+
+  if (!response.ok) {
+    throw new Error('Failed to delete job description');
+  }
+
+}
+
+const updateJobDesc = async (job) => {
+
+  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/updateJobDescription`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(job),
+  });
+
+  await response.json();
+
+  console.log(response)
+
+  if (!response.ok) {
+    throw new Error('Failed to update job description');
+  }
+}
+
 const JobDescriptionModal = ({
   job,
   open,
@@ -140,12 +178,21 @@ const JobDescriptionModal = ({
     updateJobState(job);
   }, [job]);
 
-  const handleClickOutside = (event) => {
+  const handleClickOutside = async (event) => {
 
     if (modalRef.current && !modalRef.current.contains(event.target)) {
-      onClose(jobState);
+        
+      await updateJobDesc(jobState)
+      onClose()
     }
   };
+
+  const handleDeleteJobDescription = async () => {
+
+    await deleteJobDesc(jobState)
+    onClose()
+
+  }
 
   const handleAddQualification = (qualification) => {
     const newQualifications = jobState.qualifications[qualification].slice();
@@ -218,15 +265,19 @@ const JobDescriptionModal = ({
         ref={modalRef}
         className="bg-white rounded-lg h-[50rem] w-[80rem] flex flex-col py-5 px-8 space-y-5 overflow-auto"
       >
-        <input
-          id="job-title"
-          placeholder="Job Title"
-          className="h-10 text-3xl font-bold"
-          value={jobState.title}
-          onChange={(e) =>
-            updateJobState({ ...jobState, title: e.target.value })
-          }
-        />
+        <div className='flex flex-row justify-between'>
+          <input
+            id="job-title"
+            placeholder="Job Title"
+            className="h-10 text-3xl font-bold"
+            value={jobState.title}
+            onChange={(e) =>
+              updateJobState({ ...jobState, title: e.target.value })
+            }
+          />
+          <img src='/trash.png' className='w-8 h-8 transition duration-150 hover:scale-125'
+          onClick={handleDeleteJobDescription}/>
+        </div>
         <div className="flex flex-row space-x-4">
           <select
             className=" bg-white border-[#57116F] border-[1px] rounded-full px-3 py-1"

@@ -47,7 +47,7 @@ const PDFUploader = ({onClose, setProcessing, apiURL}) => {
 
   return (
   <>
-    <input ref={fileinputRef} type="file" name="upload" accept="application/pdf" id="upload-pdf" className='opacity-0'
+    <input ref={fileinputRef} type="file" name="upload" accept="application/pdf" id="upload-pdf" className='hidden opacity-0'
     onChange={uploadPDFFile}
     />
     <label htmlFor="upload-pdf">
@@ -107,8 +107,8 @@ const UploadPDFModal = ({ open, onClose, apiURL }) => {
 	return (
 		<Modal open={open}>
 			<div ref={modalRef} 
-      className='bg-white rounded-lg h-[35rem] w-[30rem] md:h-[50rem] md:w-[50rem] 
-      flex flex-col justify-center items-center overflow-auto'>
+      className='bg-white rounded-lg h-[20rem] w-[35rem]
+      flex flex-col justify-center items-center'>
         { procesState ? <span>Uploading ...</span> : <PDFUploader onClose={onClose} setProcessing={setProcessing} apiURL={apiURL} /> }
 			</div>
 		</Modal>
