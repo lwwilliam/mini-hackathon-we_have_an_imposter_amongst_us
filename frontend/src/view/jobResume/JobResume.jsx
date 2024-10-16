@@ -3,6 +3,7 @@ import React from "react";
 import ResumeDetails from "./compenents/resumeDetails";
 
 import PageHeader from "../../components/pageHeader/Header.jsx";
+import { useParams } from "react-router-dom";
 
 const CandidateDetails = () => {
   const TableEmptyRow = () => {
@@ -47,6 +48,10 @@ const CandidateDetails = () => {
 }
 
 const JobResume = () => {
+  const { jobid } = useParams()
+
+  console.log(jobid)
+
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
       <PageHeader />
