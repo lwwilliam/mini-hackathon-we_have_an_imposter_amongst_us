@@ -1,5 +1,6 @@
 # Ignore global files
 *.env
+.venv
 .DS_Store
 .vscode/
 
@@ -16,6 +17,8 @@ backend/dist/
 backend/build/
 backend/*.egg-info/
 backend/.env
+backend/pdfUploads/*
+!backend/pdfUploads/.gitkeep
 
 # Ignore Frontend files
 frontend/node_modules

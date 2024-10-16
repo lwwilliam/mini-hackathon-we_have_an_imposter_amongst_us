@@ -1,10 +1,7 @@
 Flask==3.0.3
+openai==1.51.1
 pymongo==4.10.1
 python-dotenv==1.0.1
 flask_cors==5.0.0
 uwsgi==2.0.27
-openai==1.51.1
 groq==0.11.0
-pypdf==5.0.1
-colorama==0.4.6
-requests==2.32.3

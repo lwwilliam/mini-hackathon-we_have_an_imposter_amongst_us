@@ -10,6 +10,6 @@ fi
 
 python3 -m venv .venv
 . $(pwd)/.venv/bin/activate
-pip install -r requirement.txt
+pip3 install -r requirement.txt
 export FLASK_APP=flaskr/index.py
 export FLASK_ENV=development
