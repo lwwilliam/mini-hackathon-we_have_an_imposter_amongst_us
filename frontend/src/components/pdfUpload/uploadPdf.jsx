@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-
-
 const preventDefaults = (e) => {
   e.preventDefault()
   e.stopPropagation()
