@@ -1,5 +1,4 @@
 from flask import jsonify, request, make_response, send_file
-import requests
 import json
 from . import api_bp
 import os
