@@ -147,73 +147,29 @@ const DownloadAnalysis = () => {
   )
 }
 
-const ResumeDetails = () => {
-
-  const mockd = {
-    name: "Lee William",
-    summary: "Highly dependable and detail-oriented Toilet Washer with over [X] years of experience in maintaining cleanliness and sanitation in commercial, residential, and public facilities. Proficient in using cleaning products, disinfectants, and specialized equipment to ensure hygienic restroom environments. Strong understanding of health and safety standards, with a commitment to preventing the spread of bacteria and maintaining a clean, pleasant atmosphere for users. Adept at working efficiently in fast-paced environments, managing time well, and collaborating with janitorial teams to meet high cleanliness standards. Proven ability to handle multiple tasks, follow instructions precisely, and consistently achieve top-quality results.",
-    highlights: ["Deep cleaning and sanitization", "Knowledge of cleaning products and disinfectants", "Compliance with health and safety protocols", "Teamwork and communication", "Time management and efficiency"],
-    qualifications: {
-      pastExperience: [
-        {
-          name: 'Degree / Advanced Diploma in Computer Science or equivalent',
-          priority: QualPriority.Mandatory,
-          minYears: 0,
-          qualified: false,
-        },
-      ],
-      technical: [
-        { name: 'Web Applications', priority: QualPriority.Normal, minYears: 0, qualified: true },
-        {
-          name: 'RESTful APIs with JSON / XML',
-          priority: QualPriority.Normal,
-          minYears: 0,
-          qualified: false,
-        },
-        { name: 'PHP V8', priority: QualPriority.Normal, minYears: 0,
-          qualified: false, },
-        { name: 'Scrum', priority: QualPriority.Bonus, minYears: 0,
-          qualified: false, },
-        {
-          name: 'System Design & Software Implementation',
-          priority: QualPriority.Normal,
-          minYears: 5,
-          qualified: false,
-        },
-      ],
-      soft: [
-        {
-          name: 'Good communication skills',
-          priority: QualPriority.Normal,
-          minYears: 0,
-          qualified: true,
-        },
-        { name: 'Team player', priority: QualPriority.Normal, minYears: 0,
-          qualified: false, },
-        { name: 'Problem solver', priority: QualPriority.Normal, minYears: 0,
-          qualified: true, },
-      ],
-    }
-  }
-
+const ResumeDetails = ({viewing}) => {
   return (
     <div
     className="flex flex-col flex-1 bg-white rounded-xl p-10 gap-5"
     >
-      <div
-      className="flex justify-between"
-      >
-        <h1 className="font-light text-6xl place-content-center">{mockd.name}</h1>
-        <div className="flex gap-2 items-center">
-          <DownloadPDF />
-          <DownloadAnalysis />
-        </div>
-      </div>
-      <div className="flex flex-col overflow-auto gap-5">
-        <ResumeSummary summary={mockd.summary}/>
-        <ResumeHighlights highlights={mockd.highlights}/>
-        <QualificationMatched qualifications={mockd.qualifications}/>
-      </div>
+      {
+        (viewing) ? (<>
+          <div
+          className="flex justify-between"
+          >
+            <h1 className="font-light text-6xl place-content-center">{viewing.name}</h1>
+            <div className="flex gap-2 items-center">
+              <DownloadPDF />
+              <DownloadAnalysis />
+            </div>
+          </div>
+          <div className="flex flex-col overflow-auto gap-5">
+            <ResumeSummary summary={viewing.summary}/>
+            <ResumeHighlights highlights={viewing.highlights}/>
+            <QualificationMatched qualifications={viewing.qualifications}/>
+          </div>
+        </>) : (<div>Loading Data...</div>)
+      }
     </div>
   )
 }

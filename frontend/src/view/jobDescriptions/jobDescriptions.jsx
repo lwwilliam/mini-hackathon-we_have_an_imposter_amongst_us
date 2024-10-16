@@ -266,7 +266,7 @@ const JobDescriptions = () => {
                   if (isEditing) {
                     setCurrentJobDesc(job);
                   } else {
-                    nav("/job/analysis")
+                    nav(`/job/${job._id}/analysis`)
                   }
                 }}
               />
