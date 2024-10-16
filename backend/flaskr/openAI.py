@@ -101,11 +101,13 @@ def openAI():
                 model=MODEL_NAME,
                 response_format={"type": "json_object"},
             )
+            print("HELLO")
             storePDF(file, json.loads(chat_completion.choices[0].message.content))
             # print(chat_completion.choices[0].message.content)
             # return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
             return jsonify({"msg" : json.loads(chat_completion.choices[0].message.content)}), 200
         except Exception as e:
+            print(e)
             return jsonify({"error": str(e)}), 500
 
 jd_json = '{"title": "job title (string)","mode": "work location (string)","type": "employment type (string)","position": "job position (string)","location": "location of job (string)","description": "description of job (string)","qualifications": {"pastExperience": [{"name": "name of experience (string)","priority": "mandatory",// Can be "mandatory", "bonus", or "normal""minYears": 3// Example: 3 years of experience}],"technical": [{"name": "name of technical skill (string)","priority": "bonus",// Can be "mandatory", "bonus", or "normal""minYears": 2// Example: 2 years of skill experience}],"soft": [{"name": "name of soft skill (string)","priority": "normal",// Can be "mandatory", "bonus", or "normal""minYears": 1// Example: 1 year of soft skill experience}]},"responsibilities": ["responsibilities of work (string)"]}'
@@ -152,3 +154,5 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+# @api_bp.route('/analysis', methods=['get'])
