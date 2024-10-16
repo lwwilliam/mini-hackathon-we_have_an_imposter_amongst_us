@@ -28,11 +28,12 @@ const JobDescriptionCard = ({
   onClick,
 }) => {
   const details = [job.mode, job.type, job.position].join(', ');
-  const skills = job.qualifications.technical
+
+  const skills = [job.qualifications.technical, job.qualifications.soft]
     .slice(0, 3)
     .map((q) => q.name)
     .join(', ')
-    .concat(`, +${job.qualifications.technical.length}`);
+    .concat(`, +${job.qualifications.technical.length + job.qualifications.soft.length}`);
 
   return (
     <div
