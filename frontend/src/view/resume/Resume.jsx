@@ -24,13 +24,20 @@ const UploadButton = () => {
     setModalState(true)
   }
 
+  const onClose = () => {
+
+    setModalState(false)
+    window.location.reload()
+
+  }
+
   return (
     <>
     <button
       className='bg-[#57116F] text-white px-5 rounded-3xl'
       onClick={openUploadPDFModal}
     >Upload</button>
-    <ResumeUploader open={modelState} onClose={() => setModalState(false)} />
+    <ResumeUploader open={modelState} onClose={onClose} />
     {/* <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}/api/ai`}/> */}
     </>
   )
@@ -94,7 +101,6 @@ const ResumeTables = () => {
         </div>
       </div>
     </div>
-
   )
 }
 
