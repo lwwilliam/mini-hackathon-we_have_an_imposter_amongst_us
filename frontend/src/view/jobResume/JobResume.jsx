@@ -37,7 +37,7 @@ const CandidateDetails = () => {
 
         { /** Max rows is 5 */ }
         <div className='grid grid-rows-5 overflow-auto text-center flex-1 bg-white border-collapse'>
-          { data.map((val) => <TableRowData name={val.name} matched={val.matched} />) }
+          { data.map((val, index) => <TableRowData key={index} name={val.name} matched={val.matched} />) }
         </div>
       </div>
       <p className='self-stretch text-right'>Page 1 of 2</p>

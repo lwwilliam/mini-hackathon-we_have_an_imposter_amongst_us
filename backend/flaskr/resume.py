@@ -1,9 +1,5 @@
-<<<<<<< HEAD:backend/flaskr/openAI.py
-from flask import jsonify, request
 import requests
-=======
 from flask import jsonify, request, make_response, send_file
->>>>>>> 9343a56d09855e7a25a7f3a563777810d0dddc7a:backend/flaskr/resume.py
 import json
 from . import api_bp
 import os
@@ -81,11 +77,6 @@ def openAI():
         return jsonify({"error": "No selected file"}), 400
 
     if file:
-<<<<<<< HEAD:backend/flaskr/openAI.py
-=======
-        # print(Fore.RED, getAllTags()[0].get_json(), Style.RESET_ALL)
-        storePDF(file)
->>>>>>> 9343a56d09855e7a25a7f3a563777810d0dddc7a:backend/flaskr/resume.py
         reader = PdfReader(file)
         page = reader.pages[0]
         extract_text = page.extract_text()
@@ -163,10 +154,6 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-<<<<<<< HEAD:backend/flaskr/openAI.py
-
-# @api_bp.route('/analysis', methods=['get'])
-=======
         
 
 @api_bp.route('/getPDF', methods=['GET'])
@@ -195,4 +182,3 @@ def getResume():
         resume['_id'] = str(resume['_id'])
         resumes.append(resume)
     return jsonify(resumes), 200
->>>>>>> 9343a56d09855e7a25a7f3a563777810d0dddc7a:backend/flaskr/resume.py

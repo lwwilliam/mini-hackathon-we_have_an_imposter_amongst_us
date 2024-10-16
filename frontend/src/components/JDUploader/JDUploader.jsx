@@ -1,21 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import PDFUploader from "../pdfUpload/uploadPdf";
 import Modal from "../Modal";
+import TagDivs from "./TagDivs";
 
-const TagDivs = ({tagData, clicked, onClick}) => {
-	const clickHandler = () => {
-		onClick()
-	}
-
-	return (
-	<div 
-		className={`px-3 border-1 border-black border-solid rounded-xl ${clicked ? 'bg-green-500' : 'bg-white'}`}
-		onClick={clickHandler}
-	>
-		{tagData.tag_name}
-	</div>
-	)
-}
 
 const JDUploader = ({ open, onClose }) => {
 	const modalRef = useRef(null);
@@ -105,8 +92,9 @@ const JDUploader = ({ open, onClose }) => {
 					<div className="flex flex-col gap-2">
 						<div>Select Tags: </div>
 						<div className="flex flex-wrap gap-2">
-							{ allTags.map( (val) =>
+							{ allTags.map( (val, index) =>
 								<TagDivs 
+								key={index}
 								tagData={val}
 								clicked={tagArray.indexOf(val) >= 0}
 								onClick={() => modifyTagArray(val)}
