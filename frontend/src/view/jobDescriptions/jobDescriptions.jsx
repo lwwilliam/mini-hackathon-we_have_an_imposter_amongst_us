@@ -89,8 +89,11 @@ const JobDescriptions = () => {
 
   useEffect(() => {
     getJobDescs(setJobDescriptions);
-    setSearchResults(allJobDescriptions)
   }, []);
+
+  useEffect(() => {
+    setSearchResults(allJobDescriptions)
+  }, [allJobDescriptions])
 
   useEffect(() => {
 
@@ -118,11 +121,7 @@ const JobDescriptions = () => {
   const filterByName = (query) => {
     const filteredData = allJobDescriptions.filter((job) => job.title.toLowerCase().includes(query.toLowerCase()));
 
-    if (filteredData.length == 0) {
-      filteredData = allJobDescriptions;
-    }
-
-    return filteredData;
+    return (filteredData.length == 0) ? allJobDescriptions : filteredData;
   };
 
   const handleSearchInputChange = (e) => {
