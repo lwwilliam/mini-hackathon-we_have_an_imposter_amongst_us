@@ -1,4 +1,5 @@
 from flask import jsonify, request, make_response, send_file
+import requests
 import json
 from . import api_bp
 import os
@@ -8,6 +9,7 @@ from openai import AzureOpenAI
 from pypdf import PdfReader
 from colorama import Fore, Style
 from .tagsAPI import getAllTags
+from collections import namedtuple
 from bson import ObjectId
 
 load_dotenv()
@@ -19,7 +21,7 @@ API_KEY = os.environ.get("AZURE_OPENAI_API_KEY")
 API_ENDPOINT = os.environ.get("API_ENDPOINT") # e.g https://YOUR_RESOURCE_NAME.openai.azure.com
 API_VERSION = "2024-08-01-preview" # e,g 2024-06-01
 MODEL_NAME = "gpt-4o" # e.g gpt-3.5-turbo
- 
+
 mongo_client = MongoClient(f'mongodb+srv://{DB_USER}:{DB_PASSWORD}@data.rnsqw.mongodb.net/')
 db = mongo_client['experian']
 pdf_collection = db['pdf']
@@ -34,11 +36,11 @@ client = AzureOpenAI(
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-def storePDF(file, tags):
+def storePDF(file, data):
     original_filename = file.filename
     pdf_entry = {
         "original_filename": original_filename,
-        **tags
+        **data
    }
 
     inserted_id = pdf_collection.insert_one(pdf_entry).inserted_id
@@ -61,9 +63,9 @@ def fetch_tags():
         else:
             print(f"Error: {response.status_code}")
     except Exception as e:
-        print(f"An error occurred: {str(e)}") 
+        print(f"An error occurred: {str(e)}")
 
-tags_json = '{tag_ids: ["tagid1", "tagid2", "tagid3"]}'
+tags_json = '{"name": "candidate name", "tag_ids": ["tagid1", "tagid2", "tagid3"]}'
 
 @api_bp.route('/ai', methods=['POST'])
 def openAI():
@@ -80,15 +82,15 @@ def openAI():
         reader = PdfReader(file)
         page = reader.pages[0]
         extract_text = page.extract_text()
-        # print(extract_text)
+        #print(extract_text)
         try:
             chat_completion = client.chat.completions.create(
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a hr that takes in a resume as text, your job is to match which tags best suits the resume. The tags will be passed to you in json form\n"
+                        "content": "You are a HR that takes in a resume as text, your job is to match which tags best suits the resume. The tags will be passed to you in json form\n"
                         f"The JSON object you return will be in this format:\n{tags_json}\n"
-                        "the return JSON object must have between 1 to 3 _id in an array form and only the id\n"
+                        "the return JSON object must have between 1 to 3 _id in an array form and only the id, and also the candidate name from the resume\n"
                         f"Here are the tag name, _id and description:\n{fetch_tags()}\n",
                         # "response_format": {"type": "json_object"}
                     },
@@ -101,9 +103,9 @@ def openAI():
                 model=MODEL_NAME,
                 response_format={"type": "json_object"},
             )
-            print("HELLO")
+            #print("HELLO")
             storePDF(file, json.loads(chat_completion.choices[0].message.content))
-            # print(chat_completion.choices[0].message.content)
+            #print(chat_completion.choices[0].message.content)
             # return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
             return jsonify({"msg" : json.loads(chat_completion.choices[0].message.content)}), 200
         except Exception as e:
@@ -116,10 +118,21 @@ jd_json = '{"title": "job title (string)","mode": "work location (string)","type
 def parseJD():
     # extract_text = request.get_json()['jobDescription']
     extract_text = ""
+    print(request.files)
     if 'File' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
 
+    if request.form.get('tags') is None:
+        return jsonify({"error": "No tags part in the request"}), 400
+
     file = request.files['File']
+
+    tagsData = request.form.to_dict(flat=True)['tags']
+    # tagsData = request.form.get('tags')
+    # tags = jsonify(tagsData)
+
+    # Parse JSON into an object with attributes corresponding to dict keys.
+    tags = tagsData.split(',')
 
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
@@ -150,15 +163,14 @@ def parseJD():
                 response_format={"type": "json_object"},
             )
             # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
-            jd_collection.insert_one(json.loads(chat_completion.choices[0].message.content))
+            jd_collection.insert_one({ **json.loads(chat_completion.choices[0].message.content), **{'tags': tags}})
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-        
 
 @api_bp.route('/getPDF', methods=['GET'])
 def getPDF():
-    id = request.json.get('id')
+    id = request.args.get('id')
 
     try:
         filename = id + ".pdf"
@@ -182,8 +194,7 @@ def getResume():
         resume['_id'] = str(resume['_id'])
         resumes.append(resume)
     return jsonify(resumes), 200
-
-
+ 
 def getResumeWithTag(tags, job):
     resumes = []
 

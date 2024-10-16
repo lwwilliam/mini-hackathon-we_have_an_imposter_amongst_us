@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
+import React, { useState, useEffect } from 'react';
 import PageHeader from '../../components/pageHeader/Header.jsx';
+import DisplayPDFModal from './resumeModal.jsx';
+import ResumeUploader from '../../components/ResumeUploader/ResumeUploader.jsx';
 
 const SearchBar = () => {
   return (
@@ -30,7 +30,8 @@ const UploadButton = () => {
       className='bg-[#57116F] text-white px-5 rounded-3xl'
       onClick={openUploadPDFModal}
     >Upload</button>
-    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}api/ai`}/>
+    <ResumeUploader open={modelState} onClose={() => setModalState(false)} />
+    {/* <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}/api/ai`}/> */}
     </>
   )
 }
@@ -43,9 +44,14 @@ const ResumeTables = () => {
     )
   }
 
-  const TableRowData = ({name, positions}) => {
+  const TableRowData = ({name, positions, id}) => {
+    const [modelState, setModalState] = useState(false)
+    const openResumeModal = () => {
+      setModalState(true)
+    }
     return (
-      <div className='grid grid-cols-3 py-2 border-b-2 border-solid border-[#E6E6E6]'>
+      <div className='grid grid-cols-3 py-2 border-b-2 border-solid border-[#E6E6E6] cursor-pointer' onClick={openResumeModal}>
+        <DisplayPDFModal open={modelState} onClose={() => setModalState(false)} id={id}/>
         <p>{name}</p>
         <p className='col-span-2 text-ellipsis overflow-hidden whitespace-nowrap'>{positions}</p>
       </div>
@@ -53,25 +59,40 @@ const ResumeTables = () => {
   }
 
   // woahh mock data
-  const data = Array(6).fill({
-    name: 'Lee William',
-    positions: 'Product Engineer [PHP], Senior Software Developer (JAVA), Janitor, Toilet Washer'
-  })
+  // const data = Array(6).fill({
+  //   name: 'Lee William',
+  //   positions: 'Product Engineer [PHP], Senior Software Developer (JAVA), Janitor, Toilet Washer'
+  // })
+
+
+  const [allResume, setAllResume] = useState([]);
+
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllResumes`, {
+      method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+      setAllResume(data);
+      // console.log(data)
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  }, []);
 
   return (
-    <div className='flex flex-col gap-2 font-medium'>
+    <div className='flex flex-col gap-2 font-medium overflow-hidden'>
       <div className='flex flex-col overflow-hidden flex-1 rounded-xl'>
         <div className='grid grid-cols-3 text-center bg-[#57116F] text-white py-1'>
           <div>Candidate Name</div>
           <div className='col-span-2'>Matched Job Description</div>
         </div>
 
-        <div className='grid grid-rows-14 overflow-auto text-center flex-1 bg-white border-collapse'>
-          { data.map((val) => <TableRowData name={val.name} positions={val.positions} />) }
-          { Array(7).fill(<TableEmptyRow />) }
+        <div className='flex flex-col overflow-auto text-center flex-1 bg-white border-collapse'>
+          {allResume.map((val => <TableRowData name={val._id} positions={"test"} id={val._id} />))}
         </div>
       </div>
-      <p className='self-stretch text-right'>Page 1 of 13</p>
     </div>
 
   )
