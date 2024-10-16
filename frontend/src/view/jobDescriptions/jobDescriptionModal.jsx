@@ -169,8 +169,6 @@ const JobDescriptionModal = ({
   open,
   onClose,
 }) => {
-  console.log(job.qualifications)
-
   const modalRef = useRef(null);
   const [jobState, updateJobState] = useState(job);
 
@@ -245,7 +243,6 @@ const JobDescriptionModal = ({
     const newResponsibilities = jobState.responsibilities.filter(
       (_, i) => i !== index
     );
-    console.log(newResponsibilities);
     updateJobState({ ...jobState, responsibilities: newResponsibilities });
   };
 
@@ -393,7 +390,6 @@ const JobDescriptionModal = ({
                 className="w-8 h-8 transition duration-300 ease-in-out hover:rotate-90"
                 onClick={() => {
                   handleAddQualification('pastExperience')
-                  console.log('Add new education');
                 }}
               />
             </div>
@@ -416,7 +412,6 @@ const JobDescriptionModal = ({
                 className="w-8 h-8 transition duration-300 ease-in-out hover:rotate-90"
                 onClick={() => {
                   handleAddQualification('technical')
-                  console.log('Add new technical');
                 }}
               />
             </div>
@@ -436,7 +431,6 @@ const JobDescriptionModal = ({
                 className="w-8 h-8 transition duration-300 ease-in-out hover:rotate-90"
                 onClick={() => {
                   handleAddQualification('soft')
-                  console.log('Add new soft');
                 }}
               />
             </div>

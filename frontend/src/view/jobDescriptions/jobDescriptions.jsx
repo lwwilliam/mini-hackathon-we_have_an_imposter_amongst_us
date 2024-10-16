@@ -70,9 +70,7 @@ const getJobDescs = async (setter) => {
   }
 
   const data = await response.json();
-  console.log(response)
   setter(data);
-  console.log("Data gotten and saved")
 }
 
 
