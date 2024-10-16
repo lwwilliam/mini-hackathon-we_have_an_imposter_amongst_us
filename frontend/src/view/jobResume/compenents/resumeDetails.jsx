@@ -123,8 +123,8 @@ const ResumeHighlights = ({highlights}) => {
 
       <ul className="list-disc list-inside">
         { 
-        highlights.map((val) => 
-        <li className="list-item">{val}</li>) 
+        highlights.map((val, index) => 
+        <li key={index} className="list-item">{val}</li>) 
         }
       </ul>
   </div>
