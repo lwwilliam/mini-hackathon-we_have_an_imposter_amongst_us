@@ -36,10 +36,11 @@ const ModifiableQualificationBean = ({
 }) => {
   const elemRef = useRef(null)
   const [ editing, setEdit ] = useState(false)
-  const [ data, setData] = useState(qualification)
+  const [ data, setData ] = useState(qualification)
 
   const yearRef = useRef(null)
   const nameRef = useRef(null)
+  const editRef = useRef(null)
 
   let c = 'white';
 
@@ -63,7 +64,35 @@ const ModifiableQualificationBean = ({
     }
   };
 
+  const changeType = () => {
+
+    const priorities = [QualPriority.Mandatory, QualPriority.Bonus, QualPriority.Normal]
+    const newPriority = priorities[(priorities.indexOf(data.priority) + 1) % priorities.length]
+
+    setData({
+      ...data,
+      priority: newPriority
+    })
+  }
+
   useEffect(() => {
+
+    if (editRef.current) {
+      switch (data.priority) {
+        case QualPriority.Mandatory:
+          editRef.current.style.backgroundColor = '#FFCECE'
+          break;
+        case QualPriority.Bonus:
+          editRef.current.style.backgroundColor = '#D8FFCE'
+          break;
+        default:
+          editRef.current.style.backgroundColor = 'white'
+          break;
+      }
+    }
+
+
+
     editing
       ? document.addEventListener('mousedown', handleClickOutside)
       : document.removeEventListener('mousedown', handleClickOutside);
@@ -76,7 +105,7 @@ const ModifiableQualificationBean = ({
   return (<div ref={elemRef} onClick={() => setEdit(true)}>
     {(
     editing ? (
-      <div
+      <div ref={editRef}
         className={`flex flex-row h-10 w-fit mr-2 mb-2 space-x-2 
           justify-center items-center bg-[${c}] 
           border-[#57116F] border-[1px] rounded-full text-md px-5 py-1 text-center`}
@@ -102,8 +131,8 @@ const ModifiableQualificationBean = ({
           name: e.currentTarget.innerText
         })}
         >{data.name}</span>
-
-        <button className='bg-white border-solid border-1 border-black px-3 rounded-xl' onClick={onDelete}>X</button>
+        <img src='/change.png' className='w-5 h-5 transition duration-150 hover:scale-125' onClick={changeType} />
+        <img src='/close.png' className='w-5 h-5 transition duration-150 hover:scale-125' onClick={onDelete} />
       </div> )
     : 
     <QualificationBean qualification={qualification} />)

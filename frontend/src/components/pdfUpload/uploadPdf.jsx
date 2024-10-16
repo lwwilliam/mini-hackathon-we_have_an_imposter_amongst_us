@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Modal from "../Modal.jsx";
-import uploadImage from "../../assets/image.png"
 
 const preventDefaults = (e) => {
   e.preventDefault()
@@ -76,7 +75,7 @@ const PDFUploader = ({onClose, setProcessing, apiURL}) => {
         setDrag(false)
       }}
       >
-        <img src={uploadImage}></img>
+        <img src='/upload.png'></img>
         <span className='text-center'>
           Drop files here to upload
         </span>
