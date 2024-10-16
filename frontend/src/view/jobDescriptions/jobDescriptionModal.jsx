@@ -1,27 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Job,
-  JobMode,
-  JobType,
-  Qualification,
-  QualPriority,
-} from '../../types';
-
+import { QualPriority, JobMode, JobType } from '../../constants';
 import Modal from '../../components/Modal';
-import { useLocation } from 'react-router-dom';
 
-
-interface JobDescriptionModalProps {
-  job: Job;
-  open: boolean;
-  onClose: (job: Job) => void;
-}
-
-interface QualificationBeanProps {
-  qualification: Qualification;
-}
-
-const QualificationBean: React.FC<QualificationBeanProps> = ({
+const QualificationBean = ({
   qualification,
 }) => {
   let c = 'white';
@@ -48,23 +29,17 @@ const QualificationBean: React.FC<QualificationBeanProps> = ({
   );
 };
 
-interface modifiableBeanProps {
-  qualification: Qualification;
-  onClose: (newQualification: Qualification) => void;
-  onDelete: () => void;
-}
-
-const ModifiableQualificationBean: React.FC<modifiableBeanProps> = ({
+const ModifiableQualificationBean = ({
   qualification,
   onClose,
   onDelete
 }) => {
-  const elemRef = useRef<HTMLDivElement | null>(null)
-  const [ editing, setEdit ] = useState<Boolean>(false)
-  const [ data, setData] = useState<Qualification>(qualification)
+  const elemRef = useRef(null)
+  const [ editing, setEdit ] = useState(false)
+  const [ data, setData] = useState(qualification)
 
-  const yearRef = useRef<HTMLSpanElement | null>(null)
-  const nameRef = useRef<HTMLSpanElement | null>(null)
+  const yearRef = useRef(null)
+  const nameRef = useRef(null)
 
   let c = 'white';
 
@@ -74,8 +49,8 @@ const ModifiableQualificationBean: React.FC<modifiableBeanProps> = ({
     c = '#D8FFCE';
   }
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (elemRef.current && !elemRef.current.contains(event.target as Node)) {
+  const handleClickOutside = (event) => {
+    if (elemRef.current && !elemRef.current.contains(event.target)) {
       const newData = data
 
       if (yearRef.current)
@@ -135,13 +110,8 @@ const ModifiableQualificationBean: React.FC<modifiableBeanProps> = ({
     }</div>)
   }
 
-interface ResponsibilityListItemProps {
-  content: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onDelete: () => void;
-}
 
-const ResponsibilityListItem: React.FC<ResponsibilityListItemProps> = ({ content, onChange, onDelete }) => {
+const ResponsibilityListItem = ({ content, onChange, onDelete }) => {
   return (
     <li>
       <div className="flex flex-row justify-between w-full">
@@ -156,30 +126,28 @@ const ResponsibilityListItem: React.FC<ResponsibilityListItemProps> = ({ content
   );
 };
 
-const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
+const JobDescriptionModal = ({
   job,
   open,
   onClose,
 }) => {
   console.log(job.qualifications)
 
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const [jobState, updateJobState] = useState<Job>(job);
+  const modalRef = useRef(null);
+  const [jobState, updateJobState] = useState(job);
 
   useEffect(() => {
     updateJobState(job);
   }, [job]);
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = (event) => {
 
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
       onClose(jobState);
     }
   };
 
-  type qualifications = "pastExperience" | "technical" | "soft"
-
-  const handleAddQualification = (qualification: qualifications) => {
+  const handleAddQualification = (qualification) => {
     const newQualifications = jobState.qualifications[qualification].slice();
     newQualifications.push({
       name: 'New Qualification',
@@ -195,7 +163,7 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
     })
   }
 
-  const handleModifyQualification = (qualification: qualifications, i: number) => (newQualification: Qualification) => {
+  const handleModifyQualification = (qualification, i) => (newQualification) => {
     const newQualifications = jobState.qualifications[qualification].slice();
     newQualifications[i] = newQualification
     updateJobState({ 
@@ -207,7 +175,7 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
     })
   }
 
-  const handleDeleteQualification = (qualification: qualifications, index: number) => () => {
+  const handleDeleteQualification = (qualification, index) => () => {
     const newQualifications = jobState.qualifications[qualification].filter(
       (_, i) => i !== index
     );
@@ -226,7 +194,7 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
     updateJobState({ ...jobState, responsibilities: newResponsibilities });
   };
 
-  const handleDeleteResponsibilityListItem = (index: number) => {
+  const handleDeleteResponsibilityListItem = (index) => {
     const newResponsibilities = jobState.responsibilities.filter(
       (_, i) => i !== index
     );
@@ -264,7 +232,7 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             className=" bg-white border-[#57116F] border-[1px] rounded-full px-3 py-1"
             value={jobState.mode}
             onChange={(e) =>
-              updateJobState({ ...jobState, mode: e.target.value as JobMode })
+              updateJobState({ ...jobState, mode: e.target.value})
             }
           >
             <option value={JobMode.Onsite}>On-Site</option>
@@ -275,7 +243,7 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             className=" bg-white border-[#57116F] border-[1px] rounded-full px-3 py-1"
             value={jobState.type}
             onChange={(e) =>
-              updateJobState({ ...jobState, type: e.target.value as JobType })
+              updateJobState({ ...jobState, type: e.target.value})
             }
           >
             <option value={JobType.FullTime}>Full Time</option>
@@ -331,11 +299,11 @@ const JobDescriptionModal: React.FC<JobDescriptionModalProps> = ({
             </div>
             <div id="responsibilities" className="pl-5">
               <ul className="list-disc space-y-2">
-                {jobState.responsibilities.map((r: string, i: number) => (
+                {jobState.responsibilities.map((r, i) => (
                   <ResponsibilityListItem
                   key={i}
                   content={r}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                  onChange={(e) => {
                     const newResponsibilities = jobState.responsibilities.slice();
                     newResponsibilities[i] = e.target.value;
                     updateJobState({

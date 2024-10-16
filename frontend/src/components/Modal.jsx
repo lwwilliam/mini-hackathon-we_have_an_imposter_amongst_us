@@ -1,11 +1,6 @@
 import React from 'react';
 
-type ModalProps = {
-  open: boolean;
-  children: React.ReactNode;
-};
-
-function Modal({ open, children }: ModalProps) {
+function Modal({ open, children }) {
   return (
     <div
       className={`fixed inset-0 flex justify-center items-center duration-300 ease-in-out transition-colors ${open ? 'visible bg-black/50' : 'invisible'}`}

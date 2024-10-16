@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UploadPDFModal from './components/uploadPdf';
+import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
 
 const SearchBar = () => {
   return (
@@ -29,7 +29,7 @@ const UploadButton = () => {
       className='bg-[#57116F] text-white px-5 rounded-3xl'
       onClick={openUploadPDFModal}
     >Upload</button>
-    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} />
+    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={``}/>
     </>
   )
 }

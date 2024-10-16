@@ -1,4 +1,5 @@
 import React from "react";
+import { QualPriority } from "../../../constants";
 
 const CheckBox = ({on}) => {
   return (
@@ -8,12 +9,6 @@ const CheckBox = ({on}) => {
       </span>
     </div>
   )
-}
-
-const QualPriority = {
-  Normal: 'normal',
-  Mandatory: 'mandatory',
-  Bonus: 'bonus',
 }
 
 const QualificationBean = ({
