@@ -155,15 +155,6 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-<<<<<<< HEAD
-
-=======
-<<<<<<< HEAD:backend/flaskr/openAI.py
-
-# @api_bp.route('/analysis', methods=['get'])
-=======
-
->>>>>>> dev
 
 @api_bp.route('/getPDF', methods=['GET'])
 def getPDF():
@@ -191,7 +182,3 @@ def getResume():
         resume['_id'] = str(resume['_id'])
         resumes.append(resume)
     return jsonify(resumes), 200
-<<<<<<< HEAD
-=======
->>>>>>> 9343a56d09855e7a25a7f3a563777810d0dddc7a:backend/flaskr/resume.py
->>>>>>> dev
