@@ -1,18 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import ResumeDetails from "./compenents/resumeDetails";
 
 import PageHeader from "../../components/pageHeader/Header.jsx";
 import { useParams } from "react-router-dom";
 
-const CandidateDetails = () => {
-  const TableEmptyRow = () => {
-    return (
-      <div className='grid grid-cols-3 py-2 border-b-2 border-solid border-[#E6E6E6] text-ellipsis overflow-hidden whitespace-nowrap'>
-      </div>
-    )
-  }
-
+const CandidateDetails = ({tableData, maxValue}) => {
   const TableRowData = ({name, matched}) => {
     return (
       <div className='grid grid-cols-3 py-2 border-b-2 border-solid border-[#E6E6E6]'>
@@ -22,12 +15,6 @@ const CandidateDetails = () => {
     )
   }
 
-  // woahh mock data
-  const data = Array(5).fill({
-    name: 'Lee William',
-    matched: '13/13'
-  })
-
   return (
     <div className='flex flex-col gap-2 font-medium'>
       <div className='flex flex-col overflow-hidden flex-1 rounded-xl'>
@@ -36,12 +23,18 @@ const CandidateDetails = () => {
           <div className='col-span-2'>Qualication Matched</div>
         </div>
 
-        { /** Max rows is 5 */ }
-        <div className='grid grid-rows-5 overflow-auto text-center flex-1 bg-white border-collapse'>
-          { data.map((val, index) => <TableRowData key={index} name={val.name} matched={val.matched} />) }
-        </div>
+        {
+          (tableData) ? (
+            <div className='grid grid-rows-5 overflow-auto text-center flex-1 bg-white border-collapse'>
+              { tableData.map((val, index) => <TableRowData key={index} name={val.name} matched={`${val.matched} / ${maxValue}`} />) }
+            </div>
+          ) : (
+            <div className="flex-1">
+              Data is Loading...
+            </div>
+          ) 
+        }
       </div>
-      <p className='self-stretch text-right'>Page 1 of 2</p>
     </div>
 
   )
@@ -49,19 +42,55 @@ const CandidateDetails = () => {
 
 const JobResume = () => {
   const { jobid } = useParams()
+  const [ results, setResults ] = useState([])
+  const [ viewing, setViewing ] = useState(undefined)
+  const [ title, setTitle ] = useState("Loading...")
+  const [ tableData, setTableData ] = useState(undefined)
+  const [ maxQua, setMaxQua ] = useState(0)
 
   console.log(jobid)
 
+  const getQualifications = (qualifyObject) => [qualifyObject.pastExperience, qualifyObject.soft, qualifyObject.technical]
+  
   const getData = async () => {
+    const jobRequest = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getJobDescription?id=${jobid}`)
+    const jobResponse = await jobRequest.json()
+
+    console.log(jobResponse)
+    setTitle(`Resume Matched for ${jobResponse.position}`)
+    const qualificationArray = getQualifications(jobResponse.qualifications)
+    const noQualify = qualificationArray.reduce((acc, value) => acc + value.length, 0)
+
+    console.log(noQualify)
+    setMaxQua(noQualify)
+
     const request = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/job/analysis?id=${jobid}`)
     const response = await request.json()
-
+    
     console.log(response)
-  }
+    const newTableData = response.map((cand) => {
+      const candidateQualification = getQualifications(cand.qualifications)
+      .map((qua) => qua.filter((value) => value.qualified))
 
+      console.log(candidateQualification)
+      const candidateOk = candidateQualification.reduce((acc, value) => acc + value.length, 0)
+      return {
+        name: cand.name,
+        matched: candidateOk
+      }
+    })
+
+    console.log("table data")
+    console.log(newTableData)
+
+    setTableData(newTableData)
+    setResults(response)
+    setViewing(response[0])
+  }
+ 
   useEffect(() => {
     getData()
-  })
+  }, [])
 
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
@@ -71,10 +100,12 @@ const JobResume = () => {
       flex-1 overflow-hidden'>
         <div className="flex flex-col gap-12 flex-1">
           <h1
-          className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl">Resumes Matched for Product Engineer [PHP]</h1>
-          <CandidateDetails />
+          className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl">
+            {title}
+            </h1>
+          <CandidateDetails tableData={tableData} maxValue={maxQua}/>
         </div>
-        <ResumeDetails />
+        <ResumeDetails viewing={viewing} />
       </div>
     </div>
   )
