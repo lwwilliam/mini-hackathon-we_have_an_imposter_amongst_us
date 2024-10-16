@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import ResumeDetails from "./compenents/resumeDetails";
 
 import PageHeader from "../../components/pageHeader/Header.jsx";
+import { useParams } from "react-router-dom";
 
 const CandidateDetails = () => {
   const TableEmptyRow = () => {
@@ -47,6 +48,21 @@ const CandidateDetails = () => {
 }
 
 const JobResume = () => {
+  const { jobid } = useParams()
+
+  console.log(jobid)
+
+  const getData = async () => {
+    const request = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/job/analysis?id=${jobid}`)
+    const response = await request.json()
+
+    console.log(response)
+  }
+
+  useEffect(() => {
+    getData()
+  })
+
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
       <PageHeader />
