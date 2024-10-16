@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, make_response, send_file
 import json
 from . import api_bp
 import os
@@ -54,7 +54,7 @@ def openAI():
         return jsonify({"error": "No selected file"}), 400
 
     if file:
-        print(Fore.RED, getAllTags()[0].get_json(), Style.RESET_ALL)
+        # print(Fore.RED, getAllTags()[0].get_json(), Style.RESET_ALL)
         storePDF(file)
         reader = PdfReader(file)
         page = reader.pages[0]
@@ -118,3 +118,31 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+        
+
+@api_bp.route('/getPDF', methods=['GET'])
+def getPDF():
+    id = request.json.get('id')
+
+    try:
+        filename = id + ".pdf"
+        # file_path = os.path.join("../pdfUpload", filename)
+        file_path = "pdfUploads/" + filename
+
+
+        print(file_path)
+        if os.path.isfile(file_path):
+            return send_file(file_path, as_attachment=True)
+        else:
+            return make_response(f"File '{filename}' not found.", 404)
+    except Exception as e:
+        return make_response(f"Error: {str(e)}"), 500
+
+@api_bp.route('/getAllResumes', methods=['GET'])
+def getResume():
+    resumes = []
+
+    for resume in pdf_collection.find({}):
+        resume['_id'] = str(resume['_id'])
+        resumes.append(resume)
+    return jsonify(resumes), 200
