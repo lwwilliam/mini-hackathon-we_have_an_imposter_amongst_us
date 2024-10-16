@@ -128,7 +128,7 @@ const GithubHighlights = ({ gitusername, disabled }) => {
 
   useEffect(() => {
     getData()
-  }, [])
+  }, [gitusername])
 
   return (
   <div className="flex flex-col gap-2">
@@ -188,7 +188,7 @@ const DownloadAnalysis = () => {
 }
 
 const ResumeDetails = ({viewing}) => {
-  console.log(viewing)
+
   return (
     <div
     className="flex flex-col flex-1 bg-white rounded-xl p-10 gap-5"
