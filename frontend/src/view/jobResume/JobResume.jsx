@@ -2,7 +2,7 @@ import React from "react";
 
 import ResumeDetails from "./compenents/resumeDetails";
 
-import PageHeader from "../pageHeader/Header";
+import PageHeader from "../../components/pageHeader/Header.jsx";
 
 const CandidateDetails = () => {
   const TableEmptyRow = () => {

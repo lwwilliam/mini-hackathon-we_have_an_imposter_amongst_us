@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Modal from "../../../components/Modal.tsx";
-import uploadImage from "../assets/uploadImage.png"
+import Modal from "../Modal.jsx";
+import uploadImage from "../../assets/image.png"
 
 const preventDefaults = (e) => {
   e.preventDefault()
   e.stopPropagation()
 }
 
-const PDFUploader = ({onClose, setProcessing}) => {
+const PDFUploader = ({onClose, setProcessing, apiURL}) => {
   const [ drag, setDrag ] = useState(false)
   const fileinputRef = useRef(null);
 
@@ -16,7 +16,8 @@ const PDFUploader = ({onClose, setProcessing}) => {
 
     console.log(file)
 
-    const url = 'http://localhost:5000/api/ai'
+    const url = apiURL
+    // const url = 'http://localhost:5000/api/ai'
     const formData = new FormData()
     formData.append('File', file)
 
@@ -84,7 +85,7 @@ const PDFUploader = ({onClose, setProcessing}) => {
   </>)
 }
 
-const UploadPDFModal = ({open, onClose}) => {
+const UploadPDFModal = ({ open, onClose, apiURL }) => {
 	const modalRef = useRef(null);
   const [procesState, setProcessing] = useState(false)
 
@@ -108,7 +109,7 @@ const UploadPDFModal = ({open, onClose}) => {
 			<div ref={modalRef} 
       className='bg-white rounded-lg h-[35rem] w-[30rem] md:h-[50rem] md:w-[50rem] 
       flex flex-col justify-center items-center overflow-auto'>
-        { procesState ? <span>Uploading ...</span> : <PDFUploader onClose={onClose} setProcessing={setProcessing} /> }
+        { procesState ? <span>Uploading ...</span> : <PDFUploader onClose={onClose} setProcessing={setProcessing} apiURL={apiURL} /> }
 			</div>
 		</Modal>
 	)

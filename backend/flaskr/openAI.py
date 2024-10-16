@@ -78,27 +78,43 @@ jd_json = '{"title": "job title (string)","mode": "work location (string)","type
 
 @api_bp.route('/parseJD', methods=['POST'])
 def parseJD():
-    extract_text = request.get_json()['jobDescription']
-    try:
-        chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a hr that takes in a job description as a string, extracts its information and outputs it in JSON.\n"
-                    f" The JSON object must use the schema:\n{jd_json}\n"
-                    "\n There can be multiple pastExperience, tehcnical and soft. If a field has no matching value to the job desciption passed in, the field itself can be empty",
-                    # "response_format": {"type": "json_object"}
-                },
-                {
-                    "role": "user",
-                    "content": extract_text + "extract the job description",
-                    # "response_format": {"type": "json_object"}
-                }
-            ],
-            model="llama3-8b-8192",
-            response_format={"type": "json_object"},
-        )
-        jd_collection.insert_one(json.loads(chat_completion.choices[0].message.content))
-        return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    # extract_text = request.get_json()['jobDescription']
+    extract_text = ""
+    if 'File' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+
+    file = request.files['File']
+
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    if file:
+        reader = PdfReader(file)
+        extract_text = ""
+        for page in reader.pages:
+            extract_text += page.extract_text()
+        print(Fore.RED, extract_text, Style.RESET_ALL)
+        try:
+            chat_completion = client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a hr that takes in a job description as a string, extracts its information and outputs it in JSON.\n"
+                        f" The JSON object must use the schema:\n{jd_json}\n"
+                        "\n There can be multiple pastExperience, tehcnical and soft. If a field has no matching value to the job desciption passed in, the field itself can be empty",
+                        # "response_format": {"type": "json_object"}
+                    },
+                    {
+                        "role": "user",
+                        "content": extract_text + "extract the job description",
+                        # "response_format": {"type": "json_object"}
+                    }
+                ],
+                model="llama3-8b-8192",
+                response_format={"type": "json_object"},
+            )
+            print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
+            jd_collection.insert_one(json.loads(chat_completion.choices[0].message.content))
+            return jsonify({"msg" : "pdf uploaded successfully"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
