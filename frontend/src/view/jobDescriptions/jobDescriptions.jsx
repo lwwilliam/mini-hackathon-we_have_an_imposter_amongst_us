@@ -4,7 +4,7 @@ import { JobDescriptionModal } from './jobDescriptionModal.jsx'
 import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
 import { useNavigate } from 'react-router-dom';
 
-import PageHeader from '../pageHeader/Header.jsx';
+import PageHeader from '../../components/pageHeader/Header.jsx';
 
 const emptyJob = {
   _id: '',
