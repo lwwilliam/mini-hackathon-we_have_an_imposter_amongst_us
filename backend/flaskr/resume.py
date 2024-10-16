@@ -319,8 +319,6 @@ def get_job_analysis():
             print("ERROR ANALYSIS")
             continue
         analysis['_id'] = str(resume['_id'])
-        print("test")
-        print(analysis)
         analysisAll.append(analysis)
     # print(job)
     return jsonify(analysisAll), 200
