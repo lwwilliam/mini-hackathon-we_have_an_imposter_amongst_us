@@ -79,12 +79,12 @@ const updateJobDesc = async (job) => {
 const getJobDescs = async (setter) => {
 
   const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getAllJobDescriptions`)
-  
-  
+
+
   if (!response.ok) {
     throw new Error("Failed to fetch job descriptions")
   }
-  
+
   const data = await response.json();
   console.log(response)
   setter(data);

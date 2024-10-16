@@ -2,6 +2,8 @@ import React from "react";
 
 import ResumeDetails from "./compenents/resumeDetails";
 
+import PageHeader from "../pageHeader/Header";
+
 const CandidateDetails = () => {
   const TableEmptyRow = () => {
     return (
@@ -47,10 +49,8 @@ const CandidateDetails = () => {
 const JobResume = () => {
   return (
     <div className='flex flex-col bg-gradient-to-t from-[#F4D2FF] to-[#E8E8E8] w-screen h-screen overflow-hidden'>
-      <div id="header" className='bg-black/60 w-screen h-16 flex'>
-
-			</div>
-      <div id="body" 
+      <PageHeader />
+      <div id="body"
       className='flex mx-32 py-12 gap-14
       flex-1 overflow-hidden'>
         <div className="flex flex-col gap-12 flex-1">
