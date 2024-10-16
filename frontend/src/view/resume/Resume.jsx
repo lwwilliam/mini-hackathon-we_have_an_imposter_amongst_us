@@ -90,7 +90,7 @@ const ResumeTables = () => {
         </div>
 
         <div className='flex flex-col overflow-auto text-center flex-1 bg-white border-collapse'>
-          {allResume.map((val => <TableRowData name={val.name} positions={val.tag_ids.join(", ")} id={val._id} />))}
+          {allResume.map((val => val.name && <TableRowData name={val.name} positions={val.tag_ids ? val.tag_ids.join(", ") : ""} id={val._id} />))}
         </div>
       </div>
     </div>
