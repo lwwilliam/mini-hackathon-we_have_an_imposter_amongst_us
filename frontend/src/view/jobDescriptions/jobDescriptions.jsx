@@ -4,6 +4,8 @@ import { JobDescriptionModal } from './jobDescriptionModal.jsx'
 import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
 import { useNavigate } from 'react-router-dom';
 
+import PageHeader from '../pageHeader/Header.jsx';
+
 const emptyJob = {
   _id: '',
   title: '',
@@ -135,7 +137,7 @@ const JobDescriptions = () => {
       className="bg-gradient-to-b from-[#E8E8E8] to-[#F4D2FF] w-screen h-screen flex flex-col"
     >
       <UploadPDFModal open={jdmodelState} onClose={() => setJdModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}/api/parseJD`}/>
-      <div id="header" className="bg-black/60 w-screen h-16 flex"></div>
+      <PageHeader />
       <div id="body" className="flex flex-col mx-32">
         <div id="body-header" className="flex flex-row justify-between py-12">
           <div

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
+import PageHeader from '../pageHeader/Header';
 
 const SearchBar = () => {
   return (
