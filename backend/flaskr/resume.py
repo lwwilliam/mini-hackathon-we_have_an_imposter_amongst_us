@@ -11,6 +11,7 @@ from colorama import Fore, Style
 from .tagsAPI import getAllTags
 from collections import namedtuple
 from bson import ObjectId
+from io import BytesIO
 
 load_dotenv()
 DB_USER = os.environ.get("DB_USER")
@@ -80,8 +81,12 @@ def openAI():
 
     if file:
         reader = PdfReader(file)
-        page = reader.pages[0]
-        extract_text = page.extract_text()
+        extract_text = ""
+        for page in reader.pages:
+            extract_text += page.extract_text()
+        # reader = PdfReader(file)
+        # page = reader.pages[0]
+        # extract_text = page.extract_text()
         #print(extract_text)
         try:
             chat_completion = client.chat.completions.create(
@@ -211,10 +216,21 @@ def getResumeWithTag(tags, job):
     return resumes
 
 
-analysis_json = '{   "name": "name",   "summary": "short summary of past experiences.",   "highlights": ["highlight1", "highlight2", "highlight3", "highlight4", "highlight5"],   "qualifications": {     "pastExperience": [       {         "name": "name of past experience",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       }     ],     "technical": [       {         "name": "name of technical skill",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       },     ],     "soft": [       {         "name": "name of soft skill",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       },     ]   } }'
+# analysis_json = '{   "name": "name",   "summary": "short summary of past experiences.",   "highlights": ["highlight1", "highlight2", "highlight3", "highlight4", "highlight5"],   "qualifications": {     "pastExperience": [       {         "name": "name of past experience",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       }     ],     "technical": [       {         "name": "name of technical skill",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       },     ],     "soft": [       {         "name": "name of soft skill",         "priority": "priority",         "minYears": 0,         "qualified": true // boolean return value depending if resume is qualified       },     ]   } }'
+analysis_json = '{   "name": "name",   "summary": "short summary of past experiences.",   "highlights": ["highlight1", "highlight2", "highlight3", "highlight4", "highlight5"],   "qualifications": {     "pastExperience": [       {         "name": "name of past experience",         "priority": "priority",         "minYears": 0,         "qualified": "true / false (boolean)" }     ],     "technical": [       {         "name": "name of technical skill",         "priority": "priority",         "minYears": 0,         "qualified": "true / false (boolean)" }     ],     "soft": [       {         "name": "name of soft skill",         "priority": "priority",         "minYears": 0,         "qualified": "true / false (boolean)"     }     ]   } }'
 
 def analyseSingleResume(resume, jobDescription):
-    # extract_text = 
+    response =  requests.get('http://localhost:5000/api/getPDF?id=' + resume['_id'])
+    file = BytesIO(response.content)
+    if response.status_code != 200:
+        print(f"Error fetching PDF: {response.status_code}")
+        return None  # or handle the error as needed
+    reader = PdfReader(file)
+    extract_text = ""
+    print(len(reader.pages))
+    for page in reader.pages:
+        extract_text += page.extract_text()
+    
     try:
         chat_completion = client.chat.completions.create(
             messages=[
@@ -270,7 +286,7 @@ def get_job_analysis():
         if analysis is None:
             print("ERROR ANALYSIS")
             continue
-        analysis['_id'] = string(resume['_id'])
+        analysis['_id'] = str(resume['_id'])
         print("test")
         print(analysis)
         analysisAll.append(analysis)
