@@ -109,7 +109,7 @@ def openAI():
                         f"The JSON object you return will be in this format:\n{tags_json}\n"
                         "the return JSON object must have between 1 to 3 _id in an array form and only the id, and also the candidate name from the resume\n"
                         f"Here are the tag name, _id and description:\n{fetch_tags()}\n"
-                        "if \"github\" / name cant be found remove the field",
+                        "if \"github\" / \"name\" cant be found remove the field",
                         # "response_format": {"type": "json_object"}
                     },
                     {
@@ -257,8 +257,8 @@ def analyseSingleResume(resume, jobDescription):
                     "role": "system",
                     "content": "You are a hr that takes in a resume as a string, extract and summarize its information and outputs it in JSON.\n"
                     f" The JSON object must use the schema:\n{analysis_json}\n"
-                    f"\n The new json should follow the base of the qualifications from this object:\n{jobDescription}\n"
-                    "you have to check whether each qualifications are fulfilled by the resume and change the \'qualified\' field to true / false boolean accordingly\n",
+                    f"\n The qualifications in the schema MUST follow the of the qualifications from this object:\n{jobDescription}\n"
+                    "you have to check whether each qualifications are fulfilled by the resume and add a \'qualified\' field which sets a true / false boolean accordingly\n",
                     # "response_format": {"type": "json_object"}
                 },
                 {
