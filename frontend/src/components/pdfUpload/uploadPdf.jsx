@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import Modal from "../Modal.jsx";
-
-import uploadImage from "../../assets/image.png"
-
-
 const preventDefaults = (e) => {
   e.preventDefault()
   e.stopPropagation()
