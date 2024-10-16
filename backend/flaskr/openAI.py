@@ -5,23 +5,31 @@ from . import api_bp
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
-# from bson import ObjectId
-# from openai import OpenAI
-from groq import Groq
+from openai import AzureOpenAI
 from pypdf import PdfReader
 from colorama import Fore, Style
 from .tagsAPI import getAllTags
 
+load_dotenv()
 DB_USER = os.environ.get("DB_USER")
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 UPLOAD_FOLDER = 'pdfUploads'
 
-load_dotenv()
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+API_KEY = os.environ.get("AZURE_OPENAI_API_KEY")
+API_ENDPOINT = os.environ.get("API_ENDPOINT") # e.g https://YOUR_RESOURCE_NAME.openai.azure.com
+API_VERSION = "2024-08-01-preview" # e,g 2024-06-01
+MODEL_NAME = "gpt-4o" # e.g gpt-3.5-turbo
+ 
 mongo_client = MongoClient(f'mongodb+srv://{DB_USER}:{DB_PASSWORD}@data.rnsqw.mongodb.net/')
 db = mongo_client['experian']
 pdf_collection = db['pdf']
 jd_collection = db['jobDescription']
+
+client = AzureOpenAI(
+    azure_endpoint=API_ENDPOINT,
+    api_version=API_VERSION,
+    api_key=API_KEY
+)
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -69,12 +77,10 @@ def openAI():
         return jsonify({"error": "No selected file"}), 400
 
     if file:
-        # print(Fore.RED, getAllTags()[0].get_json(), Style.RESET_ALL)
-        # print(tags_json)
-        # print(fetch_tags())
         reader = PdfReader(file)
         page = reader.pages[0]
         extract_text = page.extract_text()
+        # print(extract_text)
         try:
             chat_completion = client.chat.completions.create(
                 messages=[
@@ -82,7 +88,7 @@ def openAI():
                         "role": "system",
                         "content": "You are a hr that takes in a resume as text, your job is to match which tags best suits the resume. The tags will be passed to you in json form\n"
                         f"The JSON object you return will be in this format:\n{tags_json}\n"
-                        "the return JSON object must have between 1 to 3 _id in an array form\n"
+                        "the return JSON object must have between 1 to 3 _id in an array form and only the id\n"
                         f"Here are the tag name, _id and description:\n{fetch_tags()}\n",
                         # "response_format": {"type": "json_object"}
                     },
@@ -92,11 +98,12 @@ def openAI():
                         # "response_format": {"type": "json_object"}
                     }
                 ],
-                model="llama3-8b-8192",
+                model=MODEL_NAME,
                 response_format={"type": "json_object"},
             )
             storePDF(file, json.loads(chat_completion.choices[0].message.content))
-            # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
+            # print(chat_completion.choices[0].message.content)
+            # return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
             return jsonify({"msg" : json.loads(chat_completion.choices[0].message.content)}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
@@ -137,10 +144,10 @@ def parseJD():
                         # "response_format": {"type": "json_object"}
                     }
                 ],
-                model="llama3-8b-8192",
+                model=MODEL_NAME,
                 response_format={"type": "json_object"},
             )
-            print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
+            # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
             jd_collection.insert_one(json.loads(chat_completion.choices[0].message.content))
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
