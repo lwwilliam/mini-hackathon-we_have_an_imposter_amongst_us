@@ -179,7 +179,12 @@ def parseJD():
                 response_format={"type": "json_object"},
             )
             # print(Fore.GREEN + chat_completion.choices[0].message.content, Style.RESET_ALL)
-            jd_collection.insert_one({ **json.loads(chat_completion.choices[0].message.content), **{'tags': tags}})
+            data = json.loads(chat_completion.choices[0].message.content)
+            if (not data["mode"]):
+                data["mode"] = "Remote"
+            if (not data["type"]):
+                data["type"] = "Full Type"
+            jd_collection.insert_one({ **data, **{'tags': tags}})
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
