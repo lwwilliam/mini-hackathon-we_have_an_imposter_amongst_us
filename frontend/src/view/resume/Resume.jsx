@@ -90,7 +90,7 @@ const ResumeTables = () => {
         </div>
 
         <div className='flex flex-col overflow-auto text-center flex-1 bg-white border-collapse'>
-          {allResume.map((val => <TableRowData name={val._id} positions={"test"} id={val._id} />))}
+          {allResume.map((val => <TableRowData name={val.name} positions={"test"} id={val._id} />))}
         </div>
       </div>
     </div>
