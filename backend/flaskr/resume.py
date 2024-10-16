@@ -20,7 +20,7 @@ API_KEY = os.environ.get("AZURE_OPENAI_API_KEY")
 API_ENDPOINT = os.environ.get("API_ENDPOINT") # e.g https://YOUR_RESOURCE_NAME.openai.azure.com
 API_VERSION = "2024-08-01-preview" # e,g 2024-06-01
 MODEL_NAME = "gpt-4o" # e.g gpt-3.5-turbo
- 
+
 mongo_client = MongoClient(f'mongodb+srv://{DB_USER}:{DB_PASSWORD}@data.rnsqw.mongodb.net/')
 db = mongo_client['experian']
 pdf_collection = db['pdf']
@@ -62,7 +62,7 @@ def fetch_tags():
         else:
             print(f"Error: {response.status_code}")
     except Exception as e:
-        print(f"An error occurred: {str(e)}") 
+        print(f"An error occurred: {str(e)}")
 
 tags_json = '{tag_ids: ["tagid1", "tagid2", "tagid3"]}'
 
@@ -166,11 +166,15 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-        
+<<<<<<< HEAD:backend/flaskr/openAI.py
+
+# @api_bp.route('/analysis', methods=['get'])
+=======
+
 
 @api_bp.route('/getPDF', methods=['GET'])
 def getPDF():
-    id = request.json.get('id')
+    id = request.args.get('id')
 
     try:
         filename = id + ".pdf"

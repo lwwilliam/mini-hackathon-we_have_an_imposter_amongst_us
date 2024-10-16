@@ -9,13 +9,13 @@ const PDFUploader = ({onClose, setProcessing, onUpload, children}) => {
   const [ drag, setDrag ] = useState(false)
   const [ files, setFiles ] = useState([])
   const fileinputRef = useRef(null);
-  
+
   const uploadPDFFile = async () => {
     setProcessing(true)
     await onUpload(files)
     setProcessing(false)
     onClose()
-  } 
+  }
 
   const handleDropFile = (e) => {
     e.preventDefault()
@@ -31,9 +31,9 @@ const PDFUploader = ({onClose, setProcessing, onUpload, children}) => {
     onChange={e => setFiles(e.target.files)}
     />
     <label htmlFor="upload-pdf">
-      <div 
-      className={`bg-[#E7E7E7] h-[13rem] w-[25rem] 
-      border-dashed border-[#57116F] border-2 rounded-2xl 
+      <div
+      className={`bg-[#E7E7E7] h-[13rem] w-[25rem]
+      border-dashed border-[#57116F] border-2 rounded-2xl
       items-center justify-center gap-5 flex flex-col flex-1 text-[#57116F]
       hover:scale-105
       hover:shadow-xl
