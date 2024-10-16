@@ -1,4 +1,5 @@
 from flask import jsonify, request, make_response, send_file
+import requests
 import json
 from . import api_bp
 import os
@@ -35,11 +36,11 @@ client = AzureOpenAI(
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-def storePDF(file, tags):
+def storePDF(file, data):
     original_filename = file.filename
     pdf_entry = {
         "original_filename": original_filename,
-        **tags
+        **data
    }
 
     inserted_id = pdf_collection.insert_one(pdf_entry).inserted_id
@@ -64,7 +65,7 @@ def fetch_tags():
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
-tags_json = '{tag_ids: ["tagid1", "tagid2", "tagid3"]}'
+tags_json = '{"name": "candidate name", "tag_ids": ["tagid1", "tagid2", "tagid3"]}'
 
 @api_bp.route('/ai', methods=['POST'])
 def openAI():
@@ -81,15 +82,15 @@ def openAI():
         reader = PdfReader(file)
         page = reader.pages[0]
         extract_text = page.extract_text()
-        # print(extract_text)
+        #print(extract_text)
         try:
             chat_completion = client.chat.completions.create(
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a hr that takes in a resume as text, your job is to match which tags best suits the resume. The tags will be passed to you in json form\n"
+                        "content": "You are a HR that takes in a resume as text, your job is to match which tags best suits the resume. The tags will be passed to you in json form\n"
                         f"The JSON object you return will be in this format:\n{tags_json}\n"
-                        "the return JSON object must have between 1 to 3 _id in an array form and only the id\n"
+                        "the return JSON object must have between 1 to 3 _id in an array form and only the id, and also the candidate name from the resume\n"
                         f"Here are the tag name, _id and description:\n{fetch_tags()}\n",
                         # "response_format": {"type": "json_object"}
                     },
@@ -102,9 +103,9 @@ def openAI():
                 model=MODEL_NAME,
                 response_format={"type": "json_object"},
             )
-            print("HELLO")
+            #print("HELLO")
             storePDF(file, json.loads(chat_completion.choices[0].message.content))
-            # print(chat_completion.choices[0].message.content)
+            #print(chat_completion.choices[0].message.content)
             # return jsonify({"msg" : chat_completion.choices[0].message.content}), 200
             return jsonify({"msg" : json.loads(chat_completion.choices[0].message.content)}), 200
         except Exception as e:
@@ -166,7 +167,6 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-
 
 @api_bp.route('/getPDF', methods=['GET'])
 def getPDF():
