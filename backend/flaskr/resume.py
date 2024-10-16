@@ -126,12 +126,12 @@ def getPDF():
 
     try:
         filename = id + ".pdf"
-        # file_path = os.path.join("../pdfUpload", filename)
-        file_path = "pdfUploads/" + filename
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, "../pdfUploads", filename)
+        full_file_path = os.path.abspath(file_path)
 
-
-        print(file_path)
-        if os.path.isfile(file_path):
+        print(full_file_path)
+        if os.path.isfile(full_file_path):
             return send_file(file_path, as_attachment=True)
         else:
             return make_response(f"File '{filename}' not found.", 404)
