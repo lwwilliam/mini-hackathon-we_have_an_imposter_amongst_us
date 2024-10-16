@@ -5,10 +5,10 @@ import ResumeDetails from "./compenents/resumeDetails";
 import PageHeader from "../../components/pageHeader/Header.jsx";
 import { useParams } from "react-router-dom";
 
-const CandidateDetails = ({tableData, maxValue}) => {
-  const TableRowData = ({name, matched}) => {
+const CandidateDetails = ({ tableData, maxValue, onRowClick }) => {
+  const TableRowData = ({name, matched, onClick}) => {
     return (
-      <div className='grid grid-cols-3 py-2 border-b-2 border-solid border-[#E6E6E6]'>
+      <div className='grid grid-cols-3 py-2 border-b-2 border-solid border-[#E6E6E6]' onClick={onClick}>
         <p>{name}</p>
         <p className='col-span-2 text-ellipsis overflow-hidden whitespace-nowrap'>{matched}</p>
       </div>
@@ -26,7 +26,13 @@ const CandidateDetails = ({tableData, maxValue}) => {
         {
           (tableData) ? (
             <div className='grid grid-rows-5 overflow-auto text-center flex-1 bg-white border-collapse'>
-              { tableData.map((val, index) => <TableRowData key={index} name={val.name} matched={`${val.matched} / ${maxValue}`} />) }
+              { tableData.map((val, index) => 
+              <TableRowData 
+              key={index} 
+              name={val.name} 
+              matched={`${val.matched} / ${maxValue}`} 
+              onClick={onRowClick(index)}
+              />) }
             </div>
           ) : (
             <div className="flex-1">
@@ -51,6 +57,10 @@ const JobResume = () => {
   console.log(jobid)
 
   const getQualifications = (qualifyObject) => [qualifyObject.pastExperience, qualifyObject.soft, qualifyObject.technical]
+  
+  const onTableRowClick = (index) => () => {
+    setViewing(results[index])
+  }
 
   const getData = async () => {
     const jobRequest = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/getJobDescription?id=${jobid}`)
@@ -103,7 +113,7 @@ const JobResume = () => {
           className="bg-gradient-to-r from-[#57116F] to-[#A720D4] text-transparent bg-clip-text font-[700] text-6xl pb-10">
             {title}
             </h1>
-          <CandidateDetails tableData={tableData} maxValue={maxQua}/>
+          <CandidateDetails tableData={tableData} maxValue={maxQua} onRowClick={onTableRowClick}/>
         </div>
         <ResumeDetails viewing={viewing} />
       </div>
