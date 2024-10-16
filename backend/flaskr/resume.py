@@ -118,11 +118,11 @@ def parseJD():
             return jsonify({"msg" : "pdf uploaded successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-        
+
 
 @api_bp.route('/getPDF', methods=['GET'])
 def getPDF():
-    id = request.json.get('id')
+    id = request.args.get('id')
 
     try:
         filename = id + ".pdf"
