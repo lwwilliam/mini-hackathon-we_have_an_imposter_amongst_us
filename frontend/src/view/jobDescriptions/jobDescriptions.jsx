@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { QualPriority, JobMode, JobType } from '../../constants';
 import { JobDescriptionModal } from './jobDescriptionModal.jsx'
-import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
 import { useNavigate } from 'react-router-dom';
 
+
+import JDUploader from '../../components/JDUploader/JDUploader.jsx';
 import PageHeader from '../../components/pageHeader/Header.jsx';
 
 const emptyJob = {
@@ -134,7 +135,14 @@ const JobDescriptions = () => {
       id="main"
       className="bg-gradient-to-b from-[#E8E8E8] to-[#F4D2FF] w-screen h-screen flex flex-col"
     >
-      <UploadPDFModal open={jdmodelState} onClose={() => setJdModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}/api/parseJD`}/>
+      <JDUploader 
+      open={jdmodelState} 
+      onClose={
+        async () => {
+          await getJobDescs(setJobDescriptions);
+          setJdModalState(false)
+        }}
+      />
       <PageHeader />
       <div id="body" className="flex flex-col mx-32">
         <div id="body-header" className="flex flex-row justify-between py-12">

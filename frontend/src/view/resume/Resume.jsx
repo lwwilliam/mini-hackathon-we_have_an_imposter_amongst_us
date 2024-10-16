@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import UploadPDFModal from '../../components/pdfUpload/uploadPdf';
 import PageHeader from '../../components/pageHeader/Header.jsx';
+import ResumeUploader from '../../components/ResumeUploader/ResumeUploader.jsx';
 
 const SearchBar = () => {
   return (
@@ -30,7 +29,8 @@ const UploadButton = () => {
       className='bg-[#57116F] text-white px-5 rounded-3xl'
       onClick={openUploadPDFModal}
     >Upload</button>
-    <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}api/ai`}/>
+    <ResumeUploader open={modelState} onClose={() => setModalState(false)} />
+    {/* <UploadPDFModal open={modelState} onClose={() => setModalState(false)} apiURL={`${process.env.REACT_APP_BACKEND_URL}/api/ai`}/> */}
     </>
   )
 }
