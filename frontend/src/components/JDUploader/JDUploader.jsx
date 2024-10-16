@@ -2,17 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import PDFUploader from "../pdfUpload/uploadPdf";
 import Modal from "../Modal";
 
-const TagDivs = ({tagname, clicked, onClick}) => {
+const TagDivs = ({tagData, clicked, onClick}) => {
 	const clickHandler = () => {
 		onClick()
 	}
 
 	return (
 	<div 
-	className={`px-3 border-1 border-black border-solid rounded-xl ${clicked ? 'bg-green-500' : 'bg-white'}`}
-	onClick={clickHandler}
+		className={`px-3 border-1 border-black border-solid rounded-xl ${clicked ? 'bg-green-500' : 'bg-white'}`}
+		onClick={clickHandler}
 	>
-		{tagname}
+		{tagData.tag_name}
 	</div>
 	)
 }
@@ -30,8 +30,7 @@ const JDUploader = ({ open, onClose }) => {
 			console.error("Shit, panic")
 			return 
 		}
-		const newArray = (response).map((val) => val.tag_name)
-		setAllTags(newArray)
+		setAllTags(response)
 	}
 
 	useEffect(() => {
@@ -44,14 +43,14 @@ const JDUploader = ({ open, onClose }) => {
     }
   };
 
-	const modifyTagArray = (name) => {
+	const modifyTagArray = (tagData) => {
 		console.log(tagArray)
-		console.log(name)
+		console.log(tagData)
 		const newTagArray = tagArray.slice()
-		const index = newTagArray.indexOf(name)
+		const index = newTagArray.indexOf(tagData)
 		console.log(index)
 		if (index < 0)
-			newTagArray.push(name)
+			newTagArray.push(tagData)
 		else
 			newTagArray.splice(index, 1);
 		setTag(newTagArray)
@@ -94,9 +93,9 @@ const JDUploader = ({ open, onClose }) => {
 
 	return (
 		<Modal open={open}>
-			<div ref={modalRef} 
+			<div ref={modalRef}
       className='bg-white rounded-lg h-[35rem] w-[30rem] md:h-[50rem] md:w-[50rem] 
-      flex flex-col justify-center items-center overflow-auto px-72'>
+      flex flex-col justify-center items-center overflow-auto px-48'>
         { procesState ? <span>Uploading ...</span> : 
 				<PDFUploader 
 					onClose={onClose}
@@ -108,7 +107,7 @@ const JDUploader = ({ open, onClose }) => {
 						<div className="flex flex-wrap gap-2">
 							{ allTags.map( (val) =>
 								<TagDivs 
-								tagname={val}
+								tagData={val}
 								clicked={tagArray.indexOf(val) >= 0}
 								onClick={() => modifyTagArray(val)}
 							/>) }

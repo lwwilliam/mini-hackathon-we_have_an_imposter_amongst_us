@@ -139,7 +139,11 @@ const JobDescriptions = () => {
     >
       <JDUploader 
       open={jdmodelState} 
-      onClose={() => setJdModalState(false)}
+      onClose={
+        async () => {
+          await getJobDescs(setJobDescriptions);
+          setJdModalState(false)
+        }}
       />
       <PageHeader />
       <div id="body" className="flex flex-col mx-32">
