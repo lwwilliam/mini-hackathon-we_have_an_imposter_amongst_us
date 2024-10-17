@@ -40,7 +40,7 @@ def getAllTags():
 
 @api_bp.route('/getPdfWithTags', methods=['GET'])
 def getPdfWithTags():
-    tags_id = request.json.get('tags')
+    tags_id = request.args.get('tags')
 
     if not tags_id:
         return jsonify({"error": "No tags provided"}), 400

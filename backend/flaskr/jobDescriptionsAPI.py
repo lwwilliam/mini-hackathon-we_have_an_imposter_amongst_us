@@ -152,3 +152,20 @@ def deleteJobDescription():
     jd_collection.delete_one({'_id': ObjectId(jd_id)})
 
     return jsonify({'message': 'Job description deleted successfully'}), 200
+
+@api_bp.route('/getJDWithTags', methods=['GET'])
+def getJDWithTags():
+    tags_array = request.args.get('tags')
+    
+    if not tags_array:
+        return jsonify({'error': 'No tags provided'}), 400
+
+    tags_list = [tag.strip() for tag in tags_array.split(',')]
+
+    jd_list = list(jd_collection.find({"tags": {"$in": tags_list}}))
+
+
+    for jd in jd_list:
+        jd['_id'] = str(jd['_id'])
+
+    return jsonify(jd_list), 200
